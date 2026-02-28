@@ -9,17 +9,26 @@ This file orients AI agents to the structure of this repository. Read it before 
 ```
 .
 └── FRAMEWORK/          # AI-Optimized Project Management Framework (documentation only)
-    ├── AGENTS.md       # Detailed file reference for agents — start here for framework questions
+    ├── AGENTS.md       # This file — agent orientation and critical conventions
     ├── INDEX.md        # Framework entry point: design principles + entity hierarchy overview
-    ├── lifecycle.md    # Four-phase lifecycle: Interview → Planning → Decomposition → Implementation
-    ├── project.md      # Project, Goal, and Project Resource entity definitions
-    ├── planning.md     # Milestone and Epic entity definitions
-    ├── task.md         # Task, Subtask, and Delegation entity definitions
-    ├── relationships.md# Dependency, Blocker, Pattern Contract, Pattern Dependency definitions
-    ├── verification.md # Verification entity — how correctness is confirmed, not just doneness
+    ├── lifecycle.md    # Four-phase lifecycle, Phase Completion Records, Phase 4 bootstrap,
+    │                   # Task Addition process, Infeasibility exit, Onboarding variant
+    ├── project.md      # Project (with Status + Completion Record), Goal (with transition rules),
+    │                   # Project Resources (Tech Stack, Docs, Rules, Conventions)
+    ├── planning.md     # Milestone (with Completion Process + Review Record),
+    │                   # Epic (with Completion Process, Epic Dependencies, Infrastructure Epics)
+    ├── change-management.md  # Change Request and Scope Change entities
+    ├── risk.md         # Risk entity, Risk Register, Risk status transitions
+    ├── task.md         # Task (with Research Date), Subtask, Delegation (with Specialist Routing)
+    ├── relationships.md# Dependency, Blocker, Pattern Contract (with status definitions),
+    │                   # Pattern Dependency, Needs Review Resolution Process
+    ├── verification.md # Verification (with attempt history, failure recovery loop, staleness)
     ├── tracking.md     # Work Interval, Completion Record, project-level cost/time summary
-    ├── session-log.md  # Session Log, Decision, and Question entity definitions
-    └── reference.md    # Quick-reference: status values, delegation levels, entity-consumer map
+    ├── session-log.md  # Session Log (cardinality + parallel work), Decision, Question (aging)
+    ├── reference.md    # Status transition table, Human review outcomes, Delegation levels,
+    │                   # Abandonment Records, Tech Stack Version Update, relationship map
+    ├── er-diagram.md   # Mermaid ER diagram — full database schema, all entities and relationships
+    └── flowcharts.md   # All process flowcharts — high-level lifecycle + 17 dedicated workflow diagrams
 ```
 
 ---
@@ -30,26 +39,42 @@ The `FRAMEWORK/` directory defines a **structured project management framework**
 
 The framework's core purpose: any agent should be able to resume any project cold, from the written files alone, with no chat history and no assumed context.
 
-For a full description of each file and the framework's key concepts, see **[FRAMEWORK/AGENTS.md](FRAMEWORK/AGENTS.md)**.
-
 ---
 
 ## Quick-Start for Agents
 
 1. **Read [FRAMEWORK/INDEX.md](FRAMEWORK/INDEX.md)** for the design principles and entity hierarchy.
-2. **Read [FRAMEWORK/lifecycle.md](FRAMEWORK/lifecycle.md)** to understand the four phases and why context resets between them are non-negotiable.
+2. **Read [FRAMEWORK/lifecycle.md](FRAMEWORK/lifecycle.md)** to understand the four phases, Phase Completion Records, and the Phase 4 bootstrap sequence.
 3. **Read the entity files** relevant to the phase you're operating in:
-   - Phase 1 (Interview): `project.md`, `session-log.md`
-   - Phase 2 (Planning): `planning.md`
-   - Phase 3 (Decomposition): `task.md`, `relationships.md`, `verification.md`
-   - Phase 4 (Implementation): `tracking.md`, `session-log.md`, `reference.md`
+   - Phase 1 (Interview): `project.md`, `session-log.md`, `change-management.md`, `risk.md`
+   - Phase 2 (Planning): `planning.md`, `change-management.md`, `risk.md`
+   - Phase 3 (Decomposition): `task.md`, `relationships.md`, `verification.md`, `risk.md`
+   - Phase 4 (Implementation): `tracking.md`, `session-log.md`, `reference.md`, `verification.md`
 
 ---
 
 ## Critical Conventions
 
-- **Nothing lives in chat history.** Every decision, question, blocker, and pattern is written to a file. If it isn't written, it doesn't exist.
-- **Session Log is the cold-start anchor.** The first thing an implementing agent reads is the Session Log — it contains the active task, exact state, and priority-ordered next actions.
-- **Pattern Contract changes propagate.** If an upstream task's interface changes, downstream tasks are flagged `⚠️ Needs Review` with an inline version diff. An agent must check its Pattern Dependencies before starting any task in that status.
-- **Verification ≠ done.** A task passing its Acceptance Criteria is not the same as a task being verified. Verification confirms correctness against an authoritative source (docs, tests, human review). High-risk tasks require it.
-- **Delegation level is non-negotiable mid-task.** If something arises that changes a task's appropriate delegation level, surface it — do not proceed autonomously past the boundary.
+- **Nothing lives in chat history.** Every decision, question, blocker, pattern, risk, and scope change is written to a file. If it isn't written, it doesn't exist.
+
+- **Stage + Mode are the first thing an agent reads on cold-start.** `Project.stage` says which phase the project is in (`uninitialised / phase_1 / phase_2 / phase_3 / phase_4 / complete / abandoned / on_hold`). `Project.mode` says what is operationally happening right now (`normal / change_management / infeasibility_review / phase_gate / awaiting_specialist`). Together they determine what work is permitted and where to look next — before reading the Session Log, before reading any task. See the cold-start decision table in `flowcharts.md` Flow 0 and the full definition in `project.md`.
+
+- **Phase Completion Records gate phase transitions.** Before starting any phase, the agent reads the prior phase's Completion Record and confirms gate status is `passed`. A Session Log note saying "Phase N done" is not sufficient — the gate record is the authority. When a gate fails, Mode is set to `phase_gate` until gaps are closed.
+
+- **Session Log is the cold-start anchor.** For Phase 4 resumptions (not the first session), the agent reads the most recent Session Log entry — Active Task and Exact State — and resumes from there. For the first Phase 4 session, the agent runs the Phase 4 Bootstrap sequence (see `lifecycle.md`).
+
+- **Pattern Contract changes propagate.** If an upstream task's interface changes, downstream tasks are flagged `⚠️ Needs Review` with an inline version diff. An agent must run the Needs Review Resolution Process (in `relationships.md`) before starting any task in that status. The three outcomes — No Impact, Context Update, Significant Rework — each have a defined next state and a required Review Record.
+
+- **Verification ≠ done.** A task passing its Acceptance Criteria is not the same as a task being verified. Verification confirms correctness against an authoritative source. Verification has an attempt history — a failed attempt triggers the Verification Failure Recovery Loop (in `verification.md`), not a dead end.
+
+- **Status transitions are defined.** Every Task status transition has a trigger, precondition, required artifact, and authorizing party. See the full transition table in `reference.md`. Transitions not in the table are not permitted. Backward transitions (`👀 In Review → 🔄 Active`) are explicitly defined and limited.
+
+- **Delegation level is non-negotiable mid-task.** If something arises that changes a task's appropriate delegation level, surface it — do not proceed autonomously past the boundary. For Specialist delegation, follow the full Specialist Routing process in `task.md`.
+
+- **Changes to stable entities go through Change Requests.** If a Goal, Epic, Milestone, Constraint, or Tech Stack Entry needs to change after its defining phase, a Change Request must be created and approved before any downstream entity is modified. See `change-management.md`.
+
+- **Abandonment requires a record.** Any entity reaching `abandoned` status (Task, Epic, Milestone, Goal) must have an Abandonment Record with rationale, state at abandonment, disposition of completed work, and human sign-off. The status transition is not complete without it. See `reference.md`.
+
+- **Unplanned task discovery is a defined process.** If an agent discovers a missing Task during Phase 4, it stops, surfaces the gap, gets human confirmation, creates a full Task entity, and wires it into the dependency graph. It does not improvise or create shortcuts. See the Task Addition Process in `lifecycle.md`.
+
+- **Risks are tracked, not assumed away.** Any potential future problem identified during research or planning is a Risk record in the Risk Register — not a buried note in Task Context. Realized risks become Blockers. See `risk.md`.

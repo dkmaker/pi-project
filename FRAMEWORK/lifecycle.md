@@ -1,15 +1,18 @@
 # Project Lifecycle: The Four Phases
 
-Before any implementation happens, a project goes through three structured phases that populate the entity model from scratch. Each phase has a clear entry condition, a defined output, and ends with a deliberate context reset before the next phase begins.
+Before any implementation happens, a project goes through three structured phases that populate the entity model from scratch. Each phase has a clear entry condition, a defined output, a Phase Completion Record that gates the transition, and ends with a deliberate context reset before the next phase begins.
 
 The context reset is not a technical detail — it is a first-class part of the process. By the time implementation starts, the agent's context contains only structured, validated knowledge — not the conversational residue of how that knowledge was gathered.
 
 ```
 Phase 1: Project Interview     → Project entity + Project Resources
+         [Phase Completion Record → gate check]
          [context reset]
 Phase 2: Epic & Milestone Plan → Epics + Milestones + Goals structure
+         [Phase Completion Record → gate check]
          [context reset]
 Phase 3: Task Research         → Tasks + Subtasks + Dependencies + Pattern Contracts
+         [Phase Completion Record → gate check]
          [context reset]
 Phase 4: Implementation        → Work, tracked against the populated entity model
 ```
@@ -23,6 +26,28 @@ Capture the human's intent and transform it from raw thought into structured, va
 
 ### Why an interview, not a form
 A form produces shallow answers because humans fill in what the form asks for. A conversation surfaces what the human actually means — the interviewer can follow up on vague answers, challenge assumptions, notice contradictions, and ask "why" until the real requirement emerges. The AI is a better interviewer than a form because it understands context and can adapt its questions based on what it's heard.
+
+### Greenfield vs. Existing Codebase
+
+**The interview has two variants depending on whether the project starts from scratch or from an existing codebase.** The human's answer to the opening question determines which variant applies.
+
+#### Greenfield variant (standard)
+Follow the interview process described below in full.
+
+#### Existing codebase variant (Onboarding)
+If the human indicates they already have code, the interview is extended with an **onboarding phase** before proceeding to normal interview flow:
+
+1. **Codebase ingestion.** The agent reads or receives a description of the existing codebase structure. It reverse-engineers a draft Repository Map, Tech Stack Entries (using the versions already in use, not ideal versions), and draft Conventions from the existing patterns. This produces a starting draft, not a final set — everything is provisional until confirmed by the human.
+
+2. **Existing decisions surfaced.** Implicit decisions already baked into the codebase are surfaced as Decision records: "The existing code uses the repository pattern for database access — we are retaining this by convention." This makes previously invisible decisions visible and revisitable.
+
+3. **Existing Pattern Contracts identified.** If the codebase has established interfaces or patterns that new work must conform to, these become Pattern Contracts declared on a designated "existing codebase" baseline entity. Downstream tasks can declare Pattern Dependencies on them.
+
+4. **Technical debt as Risks.** Existing known problems or architectural weaknesses in the codebase are recorded as Risk entities (see [risk.md](risk.md)), not as Tasks to fix immediately. They are tracked, not assumed away.
+
+5. **Conflict check.** The agent's validation pass (see below) must additionally check: do any existing patterns conflict with the project's stated Goals or Constraints? Any conflicts become Questions for the human to resolve before Phase 2 begins. A conflict left unresolved here will surface as a Blocker in Phase 4 — the earlier it is named, the cheaper it is to resolve.
+
+6. **Return to standard flow.** Once the onboarding additions are made, the interview continues with the standard iterative narrowing, validation pass, and entity creation flow.
 
 ### The interview process
 
@@ -54,49 +79,64 @@ The human stays in control of all technology decisions. Web search informs, it d
 
 The human confirms, corrects, or adds. This is not a sign-off ceremony — it is a genuine challenge pass. The AI should surface real concerns, not just confirm what it heard.
 
+**Infeasibility exit:** If the validation pass reveals that the project cannot be built as stated — constraints rule out all viable approaches, goals conflict irreconcilably, budget or time prohibits the stated scope — Phase 1 does not proceed to entity creation. Instead, an **Infeasibility Finding** is produced:
+- The specific conflict is named (which Constraint contradicts which Goal, or which Goals conflict with each other)
+- The options available are enumerated: relax Constraint X, drop Goal Y, reduce scope to Z
+- The human is asked explicitly: revise the project definition, accept reduced scope, or stop?
+- Human response determines next step:
+  - *Revise* — Phase 1 continues with updated entities
+  - *Reduced scope* — accepted via a Scope Change on the Goal or Constraint (see [change-management.md](change-management.md))
+  - *Stop* — Project Status is set to `abandoned`, the Infeasibility Finding is recorded as the Project Completion Record, and the process ends. The work done in Phase 1 is not lost — it is documented analysis.
+
 **Entity creation:** As the interview progresses, the AI creates entities in real time using tool calls — not after the interview ends. When a goal is agreed on, it is written. When a tech stack entry is confirmed with its docs URL and project notes, it is written. When a constraint is stated, it is written. When a decision is made about an approach, a Decision record is created. When something cannot be resolved, a Question is created. By the end of the interview the entity model is populated, not waiting to be populated.
 
 **Interview ends when:** The AI can produce a complete, internally consistent Project entity and all Project Resources with no unresolved contradictions. Open Questions are acceptable and expected — they are captured, not resolved by force.
 
 ### Output of Phase 1
-- Project entity: Name, Vision, Goals, Non-Goals, Constraints, Repository Map
+- Project entity: Name, Vision, Goals (each with Statement and Contributing Epics placeholder), Non-Goals, Constraints, Repository Map
 - All Project Resources: Tech Stack Entries (with versions and docs), Rules, Conventions, Shared Documentation References
 - Initial set of Decisions (technology choices with rationale)
 - Initial set of Questions (anything unresolved)
+- Risk Register initialized (any risks surfaced during interview, especially for existing codebases)
+- Phase Completion Record written (see Phase Completion Records below)
 - Session Log updated as Phase 1 complete
 
 ### Context reset after Phase 1
-The interview conversation — all the back-and-forth, the exploratory questions, the false starts — is no longer useful. The signal has been extracted into structured files. A context reset means the next phase starts with a fresh agent context that reads the structured output of Phase 1, not the conversation that produced it. The agent in Phase 2 reads `PROJECT.md` and Project Resources as its starting point, giving it clean, dense context rather than a long noisy conversation to reason over.
+The interview conversation is no longer useful. The signal has been extracted into structured files. A context reset means the next phase starts with a fresh agent context that reads the structured output of Phase 1, not the conversation that produced it.
 
 ---
 
 ## Phase 2: Epic & Milestone Planning
 
 ### Purpose
-Define the high-level structure of the work: which major feature areas need to exist (Epics), what the meaningful checkpoints are (Milestones), and how Goals map to Epics. This phase is strategic — it answers "what are we building in what order" without yet asking "how."
+Define the high-level structure of the work: which major feature areas need to exist (Epics), what the meaningful checkpoints are (Milestones), how Goals map to Epics, and which Epics depend on which. This phase is strategic — it answers "what are we building in what order" without yet asking "how."
 
 ### Why a separate phase
-Epics and Milestones require holistic thinking across the whole project. If you try to plan them while simultaneously decomposing tasks, you make local decisions that compromise the global structure. This phase is deliberately high-altitude — no implementation details, no file paths, no subtasks. Those come in Phase 3.
+Epics and Milestones require holistic thinking across the whole project. If you try to plan them while simultaneously decomposing tasks, you make local decisions that compromise the global structure. This phase is deliberately high-altitude — no implementation details, no file paths, no subtasks.
 
 ### The planning process
 
-**Entry:** The agent reads the Phase 1 output: Project entity and all Resources. It does not have the interview conversation in context — only the structured result.
+**Entry:** The agent reads the Phase 1 Completion Record (gate status must be `passed`). It then reads the Project entity and all Resources. It does not have the interview conversation in context — only the structured result.
 
-**Epic proposal:** The agent proposes an initial Epic structure based on the Goals and the tech stack. Each proposed Epic covers a coherent functional area. The agent presents these to the human for review — not as a finished plan but as a starting point. The human adds, removes, merges, or splits Epics. The agent explains the rationale for its proposed groupings: why these boundaries, what would break if this epic were merged with another.
+**Epic proposal:** The agent proposes an initial Epic structure based on the Goals and the tech stack. Each proposed Epic covers a coherent functional area. The agent presents these to the human for review — not as a finished plan but as a starting point. The agent explains the rationale for its proposed groupings: why these boundaries, what would break if this epic were merged with another.
 
-**Scope definition per Epic:** For each agreed Epic, the agent works with the human to define Scope-In and Scope-Out explicitly. This is the most important output of this phase — clear scope boundaries prevent tasks in Phase 3 from sprawling. The agent actively challenges vague scope statements: *"You said 'notifications' is in scope for this epic — do you mean in-app, email, push, or all three? Each is a meaningful scope decision."*
+**Infrastructure Epics:** The agent explicitly identifies whether any necessary work (CI/CD, test infrastructure, security hardening) does not map to a Goal. If so, it proposes Infrastructure Epics and links them to the Constraints or Rules they serve (see [planning.md](planning.md)). Infrastructure Epics are not optional — if the work must be done, it must be planned.
 
-**Milestone definition:** The agent identifies natural checkpoints in the Epic sequence — moments where the project is demonstrably more complete and something could be shipped or shown. It proposes Milestones as outcome states: *"After these three Epics, a user can complete the full core workflow end-to-end. That seems like a natural MVP milestone."* Milestones get Exit Criteria — observable facts, not tasks. Human confirms or adjusts.
+**Scope definition per Epic:** For each agreed Epic, the agent works with the human to define Scope-In and Scope-Out explicitly. The agent actively challenges vague scope statements.
 
-**Web search during planning:** The agent uses web search to validate the Epic structure against known patterns for this type of project. For example: *"Projects of this type typically need an auth epic before a data epic because X — does your current ordering reflect that?"* This surfaces sequencing risks early, before tasks are defined.
+**Epic Dependencies:** The agent identifies sequencing constraints between Epics and defines Epic Dependency entities (hard or soft, with Gate Conditions where appropriate). If auth must precede user data, that is a hard Epic Dependency — not a verbal understanding.
 
-**Goal-to-Epic mapping:** Each Goal is traced to the Epics that fulfil it. If a Goal has no Epics covering it, that is surfaced as a gap. If an Epic has no Goal it advances, that is a scope-creep signal.
+**Milestone definition:** The agent identifies natural checkpoints and proposes Milestones as outcome states with Exit Criteria — observable facts, not tasks. Human confirms or adjusts.
+
+**Web search during planning:** The agent validates the Epic structure against known patterns for this type of project, surfacing sequencing risks early.
+
+**Goal-to-Epic mapping:** Each Goal is traced to the Epics that fulfil it. If a Goal has no Epics covering it, that is surfaced as a gap. If an Epic has no Goal it advances (and is not an Infrastructure Epic with a Constraint link), that is a scope-creep signal.
 
 ### Output of Phase 2
-All Epics with Name, Description, Scope-In, Scope-Out, contributing Goals, and assigned Milestone. All Milestones with Name, Description, Exit Criteria, and associated Epics. Session Log updated as Phase 2 complete.
+All Epics with Name, Description, Scope-In, Scope-Out, contributing Goals (or Constraint link for Infrastructure), Epic Dependencies, and assigned Milestone. All Milestones with Name, Description, Exit Criteria, and associated Epics. Risk Register updated with any planning-phase risks. Phase Completion Record written. Session Log updated as Phase 2 complete.
 
 ### Context reset after Phase 2
-Same reasoning as Phase 1. The planning conversation is noise. Phase 3 starts with a fresh agent that reads the structured Epic and Milestone definitions.
+Same reasoning as Phase 1. Phase 3 starts with a fresh agent that reads the structured Epic and Milestone definitions.
 
 ---
 
@@ -107,36 +147,33 @@ For each Epic, decompose the work into Tasks and Subtasks with full context, def
 
 The output of this phase is the complete task model. When Phase 3 ends, the agent in Phase 4 should be able to pick up any task and execute it without needing to research, decide, or clarify — everything is already in the task's Context field.
 
-### Why research during decomposition
-Tasks written without research are guesses. A task that says "implement webhook signature verification" without having looked at the Stripe documentation is optimistic — the actual approach, the specific headers, the exact library methods, the gotchas around timing attacks — none of that is obvious. When an agent picks up that task in Phase 4, it has to research it then, mid-execution, with a user waiting. Phase 3 moves that research cost to a time when there's no execution pressure and the findings can be recorded durably in the task's Context field.
-
 ### The decomposition process
 
-**One Epic at a time:** The agent works through Epics in their planned order, fully decomposing each one before moving to the next. This keeps context focused and ensures dependencies are visible — a task in Epic 3 that depends on a pattern established in Epic 1 is identifiable because Epic 1 is already decomposed.
+**Entry:** The agent reads the Phase 2 Completion Record (gate status must be `passed`). It then reads all Epic and Milestone entities.
 
-**Task identification:** For each Epic, the agent identifies the discrete units of work — each a single focused session, each with a clear done state. It proposes the task list to the human. The human reviews for missing tasks, tasks that are too large (should be split), or tasks that shouldn't exist given the scope boundaries.
+**One Epic at a time:** The agent works through Epics in their planned order (respecting Epic Dependencies), fully decomposing each one before moving to the next.
 
-**Research per task:** For each confirmed task, the agent researches the specific approach:
-- Web search for the relevant documentation, current best practice, known issues
-- The research findings go directly into the task's Context field — not as a separate note, embedded as the working knowledge the executing agent will need
-- If research reveals that the planned approach is wrong or outdated, the task is updated before it is finalised
-- If research raises a meaningful decision (two valid approaches with real tradeoffs), a Question is created and the human decides — the decision and rationale are recorded
+**Task identification:** For each Epic, the agent identifies discrete units of work and proposes the task list to the human.
 
-**Pattern Contracts:** When a task establishes an interface, data structure, or pattern that downstream tasks will rely on, a Pattern Contract is defined. The agent identifies these proactively: *"This task creates the filter store interface. Tasks T-026 and T-027 will consume it. Should we define a Pattern Contract here?"* The contract's Definition is written precisely enough to lock a version.
+**Research per task:** For each confirmed task, the agent researches the specific approach. The research findings go directly into the task's Context field with a **Research Date** recorded. If research reveals the planned approach is wrong or outdated, the task is updated before it is finalised.
 
-**Dependency mapping:** As tasks are defined, the agent builds the dependency graph. Hard dependencies (cannot start without) and soft dependencies (better to do after) are distinguished. If the dependency graph reveals a sequencing problem — a task that needs to come before another but was assigned to a later Epic — it is surfaced and resolved before Phase 3 ends.
+**Pattern Contracts:** When a task establishes an interface, data structure, or pattern that downstream tasks will rely on, a Pattern Contract is defined. Status is set to `draft` — it moves to `established` when the task completes in Phase 4.
 
-**Verification planning:** For tasks involving external integrations, security-sensitive code, or any approach the agent flagged as requiring validation, a Verification record is pre-populated with Type and Source — ready to be executed and marked passed/failed during Phase 4. This means the executing agent in Phase 4 knows it needs to verify, not just implement.
+**Dependency mapping:** Hard and soft Dependencies are distinguished. If the dependency graph reveals a sequencing problem, it is resolved before Phase 3 ends.
 
-**Subtask breakdown:** Each task gets its ordered Subtask list — concrete, imperative steps. Fine-grained enough to resume mid-task without re-reading the whole task.
+**Verification planning:** For tasks involving external integrations, security-sensitive code, or any approach flagged as requiring validation, a Verification record is pre-populated with Type and Source (Attempts list starts empty). This means the executing agent knows it needs to verify.
 
-**Acceptance Criteria:** Written last, after the research is done. This matters — acceptance criteria written before research are often wrong about what "done" means for a specific approach. After research, they can be precise and agent-verifiable.
+**Risk identification:** Phase 3 research is the richest source of Risks. Every web search that surfaces a library limitation, integration gotcha, performance concern, or security consideration should result in a Risk record (see [risk.md](risk.md)), not a buried note in Task Context.
+
+**Subtask breakdown:** Each task gets its ordered Subtask list — concrete, imperative steps fine-grained enough to resume mid-task.
+
+**Acceptance Criteria:** Written last, after research is done — so they reflect actual implementation requirements, not assumptions.
 
 ### Output of Phase 3
-Complete task graph for all Epics. All tasks have: Goal, Context (with embedded research), Acceptance Criteria, Affected Files, Subtasks, Delegation level, Pattern Contracts/Dependencies, pre-populated Verifications. All Dependencies mapped. All Questions from the decomposition resolved or recorded. Session Log updated as Phase 3 complete.
+Complete task graph for all Epics. All tasks have: Goal, Context (with Research Date), Acceptance Criteria, Affected Files, Subtasks, Delegation level, Pattern Contracts/Dependencies, pre-populated Verifications. All Dependencies mapped. All Epic Dependencies confirmed. Risk Register updated. All Questions from decomposition resolved or recorded. Phase Completion Record written. Session Log updated as Phase 3 complete.
 
 ### Context reset after Phase 3
-The decomposition conversation — all the research tangents, the task proposals and rejections, the back-and-forth on approach — is discarded. Phase 4 starts with a clean agent context loading the structured task model. The executing agent reads a task file and has everything it needs. It does not inherit the reasoning that produced it.
+The decomposition conversation is discarded. Phase 4 starts with a clean agent context loading the structured task model.
 
 ---
 
@@ -145,24 +182,119 @@ The decomposition conversation — all the research tangents, the task proposals
 ### Purpose
 Execute the task graph. This phase has the most structured support from the entity model — every task is a complete brief, every dependency is mapped, every pattern contract is declared, every verification is pre-planned. The agent's job is execution and honest reporting, not discovery.
 
-### Why this phase is different
-In Phases 1–3 the primary mode is *gathering and structuring*. In Phase 4 the primary mode is *executing and recording*. The agent should spend almost no time researching or deciding — those costs were paid in Phase 3. If an agent in Phase 4 finds itself needing to make a significant architectural decision, that is a signal that Phase 3 was incomplete for that task, and the task should be paused, the decision captured, and the task context updated before continuing.
+### Phase 4 Bootstrap (First Session)
+
+The transition from Phase 3 to Phase 4 is a defined sequence, not an implied continuation. The first Phase 4 session follows this exact bootstrap protocol:
+
+1. **Read the Phase 3 Completion Record.** Confirm gate status is `passed`. If not passed, Phase 4 cannot begin — surface the specific failed output checklist items to the human and return to Phase 3.
+
+2. **Read the most recent Session Log entry.** Confirm Phase 3 is marked complete and there is no Active Task already (confirming this is the first Phase 4 session, not a resume).
+
+3. **Read the Project entity** (Project, Goals, Constraints) for orientation. Not the full task graph — just the top-level intent. This takes 30 seconds and prevents the agent from operating without understanding what it's building.
+
+4. **Read all Epic entities.** Get the task table for each Epic. Identify which Epics are Active vs Pending. Note all Epic Dependencies and their satisfaction status.
+
+5. **Select the first Task.** Criteria in order:
+   - Highest-priority Pending Task
+   - In the earliest Epic whose hard Epic Dependencies are all satisfied
+   - With no unresolved Blockers
+   - With no `⚠️ Needs Review` status
+   - With all hard Task Dependencies satisfied
+
+6. **Load the selected Task fully.** Read: Context (and resolve all Project Resource references), Subtasks, Pattern Dependencies (and their source Pattern Contracts at current version), Affected Files, pre-populated Verification records.
+
+7. **Check for Context staleness.** Compare the Task's Research Date against the current date and against any Tech Stack version changes since that date. If the Research Date is older than 60 days, or if a referenced Tech Stack Entry has been updated since the Research Date, flag the Context as potentially stale. Create a Research-type Verification attempt before proceeding, confirming the approach is still valid. If it is, proceed. If not, pause and update the Task Context before execution.
+
+8. **Create the first Phase 4 Session Log entry.** Active Task: the selected Task ID. Exact State: "Beginning Phase 4, starting with [Task ID]: [Task Name]."
+
+9. **Begin execution.**
+
+**Resuming Phase 4 (subsequent sessions):** Do not run the bootstrap protocol again. Instead: read the most recent Session Log entry, find the Active Task (or Active Task Set), read the Exact State, and resume from that point. The distinction between first session and subsequent sessions is explicit — they have different entry sequences.
 
 ### The implementation loop
 
-**Task selection:** The agent reads the Session Log to find the active task, or reads the Epic task tables to find the highest-priority Pending task with no unresolved blockers and no `⚠️ Needs Review` status.
+**Task selection:** The agent reads the Session Log to find the active task, or reads the Epic task tables to find the highest-priority Pending task with no unresolved blockers, no `⚠️ Needs Review` status, and all hard Dependencies and Epic Dependencies satisfied.
 
-**Context load:** The agent reads the task file fully before writing a single line of code. It resolves all Project Resource references in the Context field. It reads any Pattern Contracts it depends on to confirm the current version matches its Pattern Dependencies.
+**Context load:** The agent reads the task file fully before writing a single line of code. It resolves all Project Resource references. It reads any Pattern Contracts it depends on to confirm the current version matches its Pattern Dependencies.
 
-**Execution:** The agent implements the task per its Subtask list, checking off each subtask as it completes. Work Intervals are recorded automatically by the extension. If the agent encounters something that changes the scope, approach, or affects a Pattern Contract, it stops and surfaces this rather than proceeding — delegation level governs how much autonomy it has.
+**Execution:** The agent implements the task per its Subtask list, checking off each subtask as it completes. Work Intervals are recorded automatically by the extension. If the agent encounters something that changes the scope, approach, or affects a Pattern Contract, it stops and surfaces this rather than proceeding.
 
-**Verification:** Tasks with pre-planned Verifications are verified before being marked Done — not after. Documentation verifications happen by reading the relevant docs. Testing verifications happen by running the tests. The agent records the result in the Verification record.
+**Verification:** Tasks with pre-planned Verifications are verified before being marked Done. The agent records the result as a Verification Attempt. If the result is `failed`, the Verification Failure Recovery Loop applies (see [verification.md](verification.md)).
 
-**Completion:** The agent calls the completion tool, which writes the Completion Record (output metrics, actual files touched, lines changed), aggregates the Work Log into total active time and cost, and updates the task status to Done. The Session Log is updated. Pattern Contracts established by this task are set to Established status.
+**Completion:** The agent calls the completion tool, which writes the Completion Record, aggregates the Work Log, and updates the task status to `👀 In Review`. The Session Log is updated. Pattern Contracts established by this task are set to `established` status.
 
-**Review propagation:** If the implementation changed a Pattern Contract, the downstream tasks are flagged `⚠️ Needs Review` with the version diff populated. The Session Log records the Pending Reviews for the human to address.
+**Review propagation:** If the implementation changed a Pattern Contract, the downstream tasks are flagged `⚠️ Needs Review` with the version diff populated. The Session Log records the Pending Reviews.
 
-**Human oversight:** After each task (or batch of tasks, depending on the human's preference), the human reviews the Completion Record — what was produced, what it cost, what changed. This is the oversight layer. It does not slow execution — it is asynchronous. The agent continues to the next task; the human reviews when ready.
+**Human oversight:** After each task (or batch of tasks, depending on the human's preference), the human reviews the Completion Record. The four defined outcomes (Approved / Accepted with Notes / Minor Revision / Significant Rework) are defined in [reference.md](reference.md).
+
+### Task Addition Process (Unplanned Task Discovery)
+
+During Phase 4, an agent may discover that a necessary Task was not identified during Phase 3. This is a predictable, normal Phase 4 occurrence — not a framework failure. The defined process:
+
+1. **Stop current task.** The agent pauses the active task before the gap causes it to proceed with incomplete foundations. The task's current Subtask state is preserved in the Session Log Exact State.
+
+2. **Surface the gap.** The agent describes what work was found missing: what it is, why it is necessary, and which Epic and Goal it maps to (if it does). If it doesn't map to any existing Epic or Goal, a Change Request is required before proceeding (see [change-management.md](change-management.md)).
+
+3. **Human confirms scope.** A Question is created: "Is [described work] in scope and should it be added as a Task to Epic X?" The human's answer is required before the Task is created. The answer is recorded as a Decision.
+
+4. **Create the Task.** If confirmed in scope: the agent creates a complete Task entity — not a shortcut. All fields are populated: Context (with fresh research), Acceptance Criteria, Affected Files, Subtasks, Delegation level, any Pattern Contracts or Dependencies. This is the Phase 3 standard applied to a single new task.
+
+5. **Wire Dependencies.** The new Task's Dependencies are connected to the existing graph: what does it require, what does it enable? If the new Task should logically precede the currently-paused task, the paused task receives a Blocker of type Dependency pointing to the new Task.
+
+6. **Record why it was missed.** A Decision record is created: why this task was not discovered in Phase 3. This is a calibration record for future decompositions, not a blame record.
+
+7. **Resume.** Once the new Task is created and positioned in the graph, the agent resumes the paused Task (if the new Task doesn't block it) or works the new Task first (if it does).
+
+---
+
+## Phase Completion Records
+
+A **Phase Completion Record** is a specialized Session Log entry created as the final act of each phase. It is the gate that the next phase's agent reads before loading anything else. If the gate is not passed, the phase is not done — regardless of what the Session Log notes say.
+
+### A Phase Completion Record consists of
+
+- **Phase number and name**
+- **Entry type** — Phase Completion Record (distinct from ordinary Session Log entries)
+- **Completion timestamp**
+- **Output checklist** — an explicit enumeration of what this phase was required to produce, with a confirmation status for each item:
+
+  **Phase 1 checklist:**
+  - [ ] Project entity: Name, Vision, Goals (all with Statements), Non-Goals, Constraints, Repository Map
+  - [ ] All Goals have Contributing Epic placeholders (or are noted as awaiting Phase 2)
+  - [ ] All Tech Stack Entries: Name, Category, Version, Purpose, Documentation URL recorded
+  - [ ] All Rules and Conventions documented
+  - [ ] All Decisions from interview recorded with rationale
+  - [ ] All unresolved issues captured as Questions (not suppressed)
+  - [ ] Risk Register initialized (even if empty)
+
+  **Phase 2 checklist:**
+  - [ ] All Epics: Name, Description, Scope-In, Scope-Out, Milestone, Goals (or Constraint link for Infrastructure Epics)
+  - [ ] All Epic Dependencies defined (hard/soft, Gate Conditions where applicable)
+  - [ ] All Milestones: Name, Description, Exit Criteria, Associated Epics
+  - [ ] Every Goal maps to at least one Contributing Epic
+  - [ ] Every Epic (non-Infrastructure) maps to at least one Goal
+  - [ ] Every Infrastructure Epic links to at least one Constraint or Project Resource
+  - [ ] No Epic without Scope-In and Scope-Out
+  - [ ] Risk Register updated with any planning risks
+
+  **Phase 3 checklist:**
+  - [ ] All Tasks for all Epics defined and reviewed by human
+  - [ ] Every Task has: Goal, Context (with Research Date), Acceptance Criteria, Affected Files, Subtasks, Delegation level
+  - [ ] No Task has an empty Context field
+  - [ ] All hard Dependencies mapped and sequencing verified
+  - [ ] All Pattern Contracts declared with initial Definition
+  - [ ] All Pattern Dependencies declared on consuming Tasks with Locked Version
+  - [ ] Pre-populated Verification records for all high-risk Tasks
+  - [ ] All Questions from decomposition resolved or recorded
+  - [ ] Risk Register updated with all research-phase risks
+
+- **Open Questions** — which Questions remain open at phase end. Not a failure — expected. Listed explicitly.
+- **Entry condition for next phase** — the specific condition stated above for the next phase, and explicit confirmation that it is met.
+- **Gate status** — **passed** / **not passed**
+  - If not passed: which output checklist items failed, and what must happen before the gate opens. The phase is not complete.
+  - If passed: the next phase may begin.
+
+**The gate status is the authoritative signal.** The next phase agent reads the Phase Completion Record first. If gate status is `not passed`, the agent stops, surfaces the specific gaps to the human, and returns to the prior phase to close them. It does not proceed on the assumption that "close enough" is acceptable.
 
 ---
 
