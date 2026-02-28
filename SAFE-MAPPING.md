@@ -1,6 +1,8 @@
 # SAFe Terminology Mapping
 
-**Purpose:** Align the framework's entity naming with SAFe (Scaled Agile Framework) — the most widely adopted agile methodology in enterprise development. Using agreed, industry-standard terms means the human and the AI agent share a common vocabulary without negotiation. When someone says "Epic," both sides already know what that means.
+**Purpose:** Align the framework's entity naming with SAFe (Scaled Agile Framework) — the most widely adopted agile methodology in enterprise development. Using agreed, industry-standard terms means 👤 the human and 🤖 the AI agent share a common vocabulary without negotiation. When someone says "Epic," both sides already know what that means.
+
+**Key:** 🤖 = AI agent action or responsibility · 👤 = Human action or responsibility · 🤝 = Both involved
 
 ---
 
@@ -48,26 +50,26 @@ Additionally SAFe defines these cross-cutting concepts that are directly relevan
 
 ### Direct Replacements
 
-| Current Name | SAFe Name | Notes |
-|---|---|---|
-| Epic | **Epic** | ✅ Already aligned. Keep as-is. |
-| Task | **Story** | The current "Task" maps to a SAFe Story — user-facing, completable in one session, has Acceptance Criteria. Rename to **Story**. |
-| Subtask | **Task** | In SAFe, a Task is a concrete technical step inside a Story. This is exactly what the current Subtask is. Rename to **Task**. |
-| Milestone | **Milestone** | SAFe uses Milestones within PI Planning. Keep as-is. |
-| Goal | **Strategic Theme** (lightweight) | SAFe Strategic Themes are the top-level business objectives that Epics serve. For solo use, "Goal" is simpler and widely understood. **Recommendation: keep "Goal" but acknowledge the SAFe equivalent.** |
-| Verification | **Acceptance Criteria check** + **Definition of Done check** | Verifications in the current framework combine both concepts. Split them: Acceptance Criteria are per-Story; Definition of Done is a project-wide checklist. |
-| Pattern Contract | **Architectural Runway / Enabler** | When a Story establishes an interface others depend on, it is creating Architectural Runway. Pattern Contracts are the dependency declarations on that runway. No perfect SAFe equivalent — keep the name but explain it in SAFe terms. |
-| Phase Completion Record | **PI Retrospective / Inspect and Adapt output** | The gate check at the end of each phase is equivalent to SAFe's Inspect and Adapt event output. Rename to **Phase Gate Record**. |
-| Session Log | *(No direct SAFe equivalent)* | SAFe doesn't model individual agent sessions. Keep "Session Log" — it's specific to AI agent resumption and has no standard alternative. |
-| Work Interval | *(No direct SAFe equivalent)* | SAFe doesn't track sub-session AI execution time. Keep "Work Interval." |
-| Change Request | **Change Request** | SAFe uses Change Requests for scope changes to committed work. ✅ Already aligned. |
-| Scope Change | **Scope Change** | ✅ Already aligned. |
-| Decision | **Decision** | SAFe records decisions as Architectural Decision Records (ADRs). Can reference ADR format optionally. ✅ Keep as-is. |
-| Question | **Impediment** (partial) | An unresolved Question that blocks a Story is a SAFe Impediment. Questions that don't block anything are more like open items in a retrospective. **Recommendation: rename blocking Questions to Impediments when they generate a Blocker; keep "Question" for unresolved but non-blocking items.** |
-| Blocker | **Impediment** | SAFe calls blockers Impediments. **Rename Blocker → Impediment.** Clears up the current Question/Blocker relationship (a Question that blocks generates an Impediment). |
-| Risk | **Risk** | ✅ Already aligned. SAFe PI Planning has a formal risk identification step with the same categories. |
-| Delegation Level | **Work Item Type** (partial) | SAFe distinguishes work item types (Enabler vs Business Feature) but doesn't have the same delegation model. Keep "Delegation" — it's agent-specific. |
-| Project Resources | **Solution Context / Architectural Runway** | Tech Stack, Rules, Conventions are part of the Solution's architectural context. Not a precise SAFe term. Keep "Project Resources." |
+| Current Name | SAFe Name | Who acts | Notes |
+|---|---|---|---|
+| Epic | **Epic** | 👤 owns · 🤖 executes | ✅ Already aligned. Keep as-is. |
+| Task | **Story** | 🤖 executes · 👤 reviews | The current "Task" maps to a SAFe Story — user-facing, completable in one session, has Acceptance Criteria. Rename to **Story**. |
+| Subtask | **Task** | 🤖 checks off each step | In SAFe, a Task is a concrete technical step inside a Story. This is exactly what the current Subtask is. Rename to **Task**. |
+| Milestone | **Milestone** | 👤 confirms reached · 🤖 evaluates criteria | SAFe uses Milestones within PI Planning. Keep as-is. |
+| Goal | **Strategic Theme** (lightweight) | 👤 defines · 🤖 references | SAFe Strategic Themes are the top-level business objectives that Epics serve. For solo use, "Goal" is simpler and widely understood. **Recommendation: keep "Goal" but acknowledge the SAFe equivalent.** |
+| Verification | **Acceptance Criteria check** + **Definition of Done check** | 🤖 runs · 👤 for human-required checks | Verifications in the current framework combine both concepts. Split them: Acceptance Criteria are per-Story; Definition of Done is a project-wide checklist. |
+| Pattern Contract | **Architectural Runway / Enabler** | 🤖 declares · 🤖 propagates on change | When a Story establishes an interface others depend on, it is creating Architectural Runway. Pattern Contracts are the dependency declarations on that runway. No perfect SAFe equivalent — keep the name but explain it in SAFe terms. |
+| Phase Completion Record | **PI Retrospective / Inspect and Adapt output** | 🤖 writes · 🤖 reads gate · 👤 confirms | The gate check at the end of each phase is equivalent to SAFe's Inspect and Adapt event output. Rename to **Phase Gate Record**. |
+| Session Log | *(No direct SAFe equivalent)* | 🤖 writes at session end · 🤖 reads on cold-start | SAFe doesn't model individual agent sessions. Keep "Session Log" — it's specific to AI agent resumption and has no standard alternative. |
+| Work Interval | *(No direct SAFe equivalent)* | 🤖 records automatically | SAFe doesn't track sub-session AI execution time. Keep "Work Interval." |
+| Change Request | **Change Request** | 👤 initiates · 🤖 processes downstream | SAFe uses Change Requests for scope changes to committed work. ✅ Already aligned. |
+| Scope Change | **Scope Change** | 👤 approves · 🤖 applies | ✅ Already aligned. |
+| Decision | **Decision** | 👤 decides · 🤖 records with rationale | SAFe records decisions as Architectural Decision Records (ADRs). Can reference ADR format optionally. ✅ Keep as-is. |
+| Question | **Impediment** (partial) | 🤖 creates · 🤖 escalates · 👤 resolves | An unresolved Question that blocks a Story is a SAFe Impediment. Questions that don't block anything are more like open items in a retrospective. **Recommendation: rename blocking Questions to Impediments when they generate a Blocker; keep "Question" for unresolved but non-blocking items.** |
+| Blocker | **Impediment** | 🤖 detects and raises · 👤 or 🤖 clears | SAFe calls blockers Impediments. **Rename Blocker → Impediment.** Clears up the current Question/Blocker relationship (a Question that blocks generates an Impediment). |
+| Risk | **Risk** | 🤖 identifies · 👤 accepts or rejects | ✅ Already aligned. SAFe PI Planning has a formal risk identification step with the same categories. |
+| Delegation Level | **Work Item Type** (partial) | 👤 sets per Story · 🤖 enforces | SAFe distinguishes work item types (Enabler vs Business Feature) but doesn't have the same delegation model. Keep "Delegation" — it's agent-specific. |
+| Project Resources | **Solution Context / Architectural Runway** | 👤 defines · 🤖 reads and references | Tech Stack, Rules, Conventions are part of the Solution's architectural context. Not a precise SAFe term. Keep "Project Resources." |
 
 ---
 
@@ -94,7 +96,7 @@ This is the most impactful change and the one most worth making.
 
 SAFe uses "Impediment" everywhere — in Scrum ceremonies, in Jira, in PI Planning risk boards. A Blocker is an Impediment. Renaming removes a custom term and replaces it with one that every practitioner already uses.
 
-The relationship also clarifies: a Question that blocks a Story generates an **Impediment** on that Story. The Impediment's resolution path points back to the Question. Resolving the Question resolves the Impediment. This is how SAFe Impediments work — they are raised by the team and owned by someone with authority to resolve them.
+The relationship also clarifies: 🤖 a Question that blocks a Story generates an **Impediment** on that Story automatically. 🤖 The Impediment's resolution path points back to the Question. 👤 Resolving the Question resolves the Impediment. This is how SAFe Impediments work — 🤖 they are raised by the team and owned by 👤 someone with authority to resolve them.
 
 ---
 
@@ -140,7 +142,7 @@ A **Spike** is more specific: it is a discrete, time-boxed investigation with a 
 
 **Important distinction:** A Spike is planned work to resolve genuine technical uncertainty before a Story can be written. It is not the same as a staleness validation check. Do not create a Spike when a Tech Stack version change triggers a context review — that is handled by an autonomous validation agent (see Research Date below), not by a planned Story. A Spike is only created when a question cannot be answered from existing knowledge and requires active investigation.
 
-Since all work is executed by AI agents, a Spike runs as a **subagent with a bounded token budget** — not an open-ended exploration. The output is a structured finding written to the Story file. The human is only involved if the finding requires a decision that changes scope or approach (which would generate a Question and, if scope-altering, a Change Request).
+Since all work is executed by 🤖 AI agents, a Spike runs as 🤖 **a subagent with a bounded token budget** — not an open-ended exploration. 🤖 The output is a structured finding written to the Story file. 👤 The human is only involved if the finding requires a decision that changes scope or approach (which would generate a Question and, if scope-altering, a Change Request).
 
 ---
 
@@ -211,11 +213,11 @@ When a Tech Stack Entry version is updated, a **validation agent** runs automati
 
 | Outcome | What happened | Who handles it |
 |---------|--------------|---------------|
-| **No impact** | The change does not affect this Story's approach | Validation agent closes the flag silently — human never sees it |
-| **Context update** | The approach is still valid but a detail changed (e.g., a method was renamed, a parameter added) | Validation agent updates the Story's Context field directly and closes the flag — human never sees it |
-| **Breaking conflict** | The approach no longer works — breaking change, deprecation, incompatibility | Validation agent raises an **Impediment** on the Story with a specific description of what changed and why the approach fails — surfaces to human |
+| **No impact** | The change does not affect this Story's approach | 🤖 Validation agent closes the flag silently — 👤 human never sees it |
+| **Context update** | The approach is still valid but a detail changed (e.g., a method was renamed, a parameter added) | 🤖 Validation agent updates the Story's Context field directly and closes the flag — 👤 human never sees it |
+| **Breaking conflict** | The approach no longer works — breaking change, deprecation, incompatibility | 🤖 Validation agent raises an **Impediment** on the Story — surfaces to 👤 human for resolution |
 
-**The human only ever sees outcome 3.** Everything that can be resolved autonomously is resolved autonomously. Only genuine conflicts requiring a decision escalate.
+**👤 The human only ever sees outcome 3.** Everything that can be resolved autonomously is resolved by 🤖 the agent. Only genuine conflicts requiring a decision escalate to 👤 the human.
 
 ### What this means for the Research Date field
 
@@ -230,10 +232,10 @@ The Research Date field is retained but its semantics change:
 
 This model defines the escalation boundary explicitly:
 
-- **Agent resolves autonomously:** no impact checks, context-only updates, routine validation passes
-- **Agent escalates to human:** breaking conflicts only — with a specific Impediment that names the Tech Stack Entry, the version that changed, the Story affected, and exactly why the Story's stated approach no longer holds
+- 🤖 **Agent resolves autonomously:** no impact checks, context-only updates, routine validation passes
+- 🤖 **Agent escalates to 👤 human:** breaking conflicts only — with a specific Impediment that names the Tech Stack Entry, the version that changed, the Story affected, and exactly why the Story's stated approach no longer holds
 
-This is the principle that applies across the entire framework: **only what genuinely requires human judgment reaches the human.** Everything else is handled by supporting agents and closed without interruption.
+This is the principle that applies across the entire framework: **only what genuinely requires 👤 human judgment reaches the human.** Everything else is handled by 🤖 supporting agents and closed without interruption.
 
 ---
 

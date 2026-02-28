@@ -11,6 +11,8 @@ Legend:
 - ❌ **Missing** — SAFe defines this; the framework does not have it at all
 - 🚫 **Deliberately excluded** — SAFe defines this at enterprise scale; excluded by design for solo/small-team use
 
+**Key:** 🤖 = AI agent action or responsibility · 👤 = Human action or responsibility · 🤝 = Both involved
+
 ---
 
 ## Work Item Hierarchy
@@ -142,21 +144,21 @@ No equivalent ceremony or structured process exists within Phase 4. The agent pi
 
 ## Quality and Completion
 
-### Acceptance Criteria
+### Acceptance Criteria 🤝
 Specific, observable conditions per Story or Feature that define when it is complete. Written before work starts. Checked when work ends.
 
 **Status: ✅ Covered**
-The framework's Story entity has Acceptance Criteria as a named field — a checklist of observable, yes/no verifiable outcomes. An agent should be able to check these against the code without human input.
+The framework's Story entity has Acceptance Criteria as a named field — a checklist of observable, yes/no verifiable outcomes. 🤖 An agent should be able to check these against the code without 👤 human input. 👤 Human-verification-required criteria are flagged explicitly for manual confirmation.
 
 > ⚠️ **Partial gap:** SAFe requires Acceptance Criteria to include **non-functional requirements** (performance, security, accessibility) explicitly, not just functional behaviour. The framework's Acceptance Criteria field is not structured to prompt for non-functional requirements. A Story about an API endpoint might have functional criteria ("returns 200 with correct payload") but miss non-functional ones ("responds within 200ms under load") unless the author thinks to include them.
 
-### Definition of Done (DoD)
+### Definition of Done (DoD) 👤 defines · 🤖 applies
 A project-wide quality checklist applied uniformly to every Story. Not specific to individual Stories. Covers code review, test coverage, documentation, deployment readiness.
 
 **Status: ❌ Missing**
 The framework has per-Story Verifications and Acceptance Criteria but no project-wide Definition of Done as a separate, reusable entity. Every Story defines its own done criteria in isolation.
 
-> ❌ **Gap to flag:** Without a DoD, each Story independently defines its quality bar. Two Stories in the same project might have different standards for code review, test coverage, or documentation. A DoD enforces a floor across all Stories and is the mechanism that prevents quality drift as a project progresses. The framework should have a DoD as a Project Resource — a checklist that is always appended to Story completion, separate from Story-specific Acceptance Criteria.
+> ❌ **Gap to flag:** Without a DoD, each Story independently defines its quality bar. Two Stories in the same project might have different standards for code review, test coverage, or documentation. A DoD enforces a floor across all Stories and is the mechanism that prevents quality drift as a project progresses. The framework should have a DoD as a Project Resource — 👤 defined once by the human, 🤖 applied by the agent as a checklist at every Story completion, separate from Story-specific Acceptance Criteria.
 
 ### Inspect and Adapt (I&A)
 SAFe's end-of-PI retrospective and re-planning event. Reviews PI performance, identifies systemic problems, and produces improvement stories for the next PI.
@@ -170,11 +172,11 @@ Phase Gate Records (currently "Phase Completion Records") serve this function at
 
 ## Risk and Dependency Management
 
-### Risk
+### Risk 🤖 identifies · 👤 accepts or rejects
 A potential future problem. SAFe PI Planning has a formal risk identification session with five categories: Resolved, Owned, Accepted, Mitigated, Roam.
 
 **Status: ✅ Covered**
-The framework has a Risk Register with Risk entities tracking probability, impact, mitigation, and status (open / mitigated / realized → Impediment / accepted). Matches SAFe's intent.
+The framework has a Risk Register with 🤖 Risk entities identified and recorded by the agent during Phases 1–3, tracking probability, impact, mitigation, and status (open / mitigated / realized → Impediment / accepted). 👤 The human makes the final accept/reject/mitigate decision on each Risk. Matches SAFe's intent.
 
 > ⚠️ **Partial gap:** SAFe's **ROAM** model (Resolved / Owned / Accepted / Mitigated) is a specific categorisation used during PI Planning to triage risks in a structured session. The framework's Risk status transitions are similar but not labelled with ROAM terminology. Minor alignment opportunity.
 
@@ -186,59 +188,59 @@ The framework has hard and soft Dependencies between Stories and Epic Dependenci
 
 > ⚠️ **Partial gap:** SAFe tracks dependencies on the **Program Board** — a physical or digital board where dependency arrows between teams are visually mapped. The framework has dependency records but no visualisation or board artefact. For complex dependency graphs, the absence of a visual map makes it harder to spot circular dependencies or critical path bottlenecks without reading individual entity files.
 
-### Impediment (Blocker)
+### Impediment (Blocker) 🤖 raises · 👤 or 🤖 clears
 Something actively preventing a team from proceeding. Owned by the Scrum Master or RTE. Has a resolution owner and path.
 
 **Status: ✅ Covered** *(currently named "Blocker" — rename to Impediment proposed)*
-The framework's Blocker/Impediment is typed (Dependency, Resource, Decision, Specialist Routing, Verification Failure), always has a Resolution Path, and gates Story status transitions. A Story cannot be Active with an unresolved Impediment.
+The framework's Blocker/Impediment is typed (Dependency, Resource, Decision, Specialist Routing, Verification Failure), 🤖 always has a Resolution Path recorded by the agent, and gates Story status transitions. 🤖 A Story cannot be Active with an unresolved Impediment. 👤 Human resolves Decision and Specialist-type Impediments. 🤖 Agent resolves Dependency and Verification-type Impediments when the condition is cleared.
 
 ---
 
 ## Change Management
 
-### Change Request
+### Change Request 👤 initiates · 🤖 processes
 A formal request to change committed scope — a Goal, Epic, Milestone, or Constraint — after it has been established.
 
 **Status: ✅ Covered**
-The framework has Change Requests and Scope Changes as distinct entities. Stable entities cannot be informally modified — a Change Request is required. This maps directly to SAFe's change control for committed PI scope.
+The framework has Change Requests and Scope Changes as distinct entities. 👤 The human initiates a Change Request. Stable entities cannot be informally modified — a Change Request is required. This maps directly to SAFe's change control for committed PI scope.
 
-### Scope Change
+### Scope Change 👤 approves · 🤖 applies
 The approved modification to a committed entity, produced when a Change Request is approved.
 
 **Status: ✅ Covered**
-Scope Changes are a distinct entity from Change Requests. Approval is required before any downstream entity is modified. The framework's Mode field includes `change_management` — when a Change Request is active, the project mode signals this to the agent.
+Scope Changes are a distinct entity from Change Requests. 👤 Approval is required before 🤖 the agent modifies any downstream entity. 🤖 The framework's Mode field includes `change_management` — when a Change Request is active, the project mode signals this to the agent automatically.
 
 ---
 
 ## Roles and Governance
 
-### Product Owner
+### Product Owner 👤
 Owns the Story backlog for one team. Writes and prioritises Stories. Defines Acceptance Criteria.
 
 **Status: 🔄 Covered differently**
-The human is the Product Owner. The framework does not model roles as separate entities — the human owns all product decisions. The agent surfaces prioritised work but the human makes final backlog decisions through Question resolution, Phase Gate Reviews, and Story review outcomes.
+👤 The human is the Product Owner. The framework does not model roles as separate entities — 👤 the human owns all product decisions. 🤖 The agent surfaces prioritised work but 👤 the human makes final backlog decisions through Question resolution, Phase Gate Reviews, and Story review outcomes.
 
-> ⚠️ **Partial gap:** There is no formal mechanism for the human to set or update Story priority within Phase 4 outside of a Change Request. If the human wants to reprioritise the remaining backlog mid-phase without changing scope, there is no lightweight entity for it. A priority adjustment is implicitly a scope change even if nothing is added or removed.
+> ⚠️ **Partial gap:** There is no formal mechanism for 👤 the human to set or update Story priority within Phase 4 outside of a Change Request. If 👤 the human wants to reprioritise the remaining backlog mid-phase without changing scope, there is no lightweight entity for it. A priority adjustment is implicitly a scope change even if nothing is added or removed.
 
-### Product Manager
+### Product Manager 👤
 Owns the Feature backlog for the ART. Defines Features, priorities them in the Program Backlog, facilitates PI Planning.
 
 **Status: 🔄 Covered differently**
-Covered by the human, the same as Product Owner. No separation of role required at solo/small-team scale.
+Covered by 👤 the human, the same as Product Owner. No separation of role required at solo/small-team scale.
 
-### Scrum Master / RTE
+### Scrum Master / RTE 🤖
 Facilitates ceremonies, removes impediments, coaches the team.
 
 **Status: 🔄 Covered differently**
-The AI agent plays the Scrum Master role — it surfaces Impediments, enforces status transition rules, runs the cold-start protocol, and keeps the project moving. The agent does not facilitate ceremonies (there are none) but it does enforce process.
+🤖 The AI agent plays the Scrum Master role — 🤖 it surfaces Impediments, enforces status transition rules, runs the cold-start protocol, and keeps the project moving. 🤖 The agent does not facilitate ceremonies (there are none) but it does enforce process.
 
-### Epic Owner
+### Epic Owner 👤
 Defines an Epic's hypothesis and benefits, facilitates its implementation at the portfolio level.
 
 **Status: ❌ Missing by name**
-The human owns all Epics. There is no Epic Owner field or role assignment on the Epic entity. For solo use this is fine. If a project involves multiple stakeholders where different people own different Epics, there is no ownership model.
+👤 The human owns all Epics. There is no Epic Owner field or role assignment on the Epic entity. For solo use this is fine. If a project involves multiple 👤 stakeholders where different people own different Epics, there is no ownership model.
 
-> ❌ **Gap to flag:** No ownership or assignment model exists anywhere in the framework. Every entity is implicitly owned by the single human. Any project involving more than one human stakeholder has no way to record who owns what.
+> ❌ **Gap to flag:** No ownership or assignment model exists anywhere in the framework. Every entity is implicitly owned by 👤 the single human. Any project involving more than one 👤 human stakeholder has no way to record who owns what.
 
 ---
 
@@ -280,23 +282,23 @@ No Sprint/Iteration concept means no Team Backlog in the SAFe sense. Stories wit
 A daily synchronisation event: what did you do, what will you do, what is blocking you.
 
 **Status: 🚫 Deliberately excluded**
-AI agents do not need a daily standup. The Session Log's Exact State field is the agent's equivalent of a standup answer — it records exactly where work is at the end of every session. The next session reads it and resumes. The human can read the Session Log at any time for the equivalent of a standup update.
+🤖 AI agents do not need a daily standup. 🤖 The Session Log's Exact State field is the agent's equivalent of a standup answer — 🤖 it records exactly where work is at the end of every session. 🤖 The next session reads it and resumes. 👤 The human can read the Session Log at any time for the equivalent of a standup update.
 
-### Sprint Review / System Demo
+### Sprint Review / System Demo 👤
 Demonstration of completed work at the end of each iteration to stakeholders.
 
 **Status: ❌ Missing**
-The framework has a Story Review process (four outcomes: Approved, Accepted with Notes, Minor Revision, Significant Rework) but it is per Story, not per iteration batch. There is no ceremony or artefact for "here is everything completed this week, review it as a set."
+The framework has a Story Review process (four outcomes: 👤 Approved, 👤 Accepted with Notes, 👤 Minor Revision, 👤 Significant Rework) but it is per Story, not per iteration batch. There is no ceremony or artefact for "here is everything completed this week, review it as a set."
 
-> ❌ **Gap to flag:** For projects with stakeholders who want a regular view of progress, there is no batch review mechanism. The human must check individual Story Completion Records. A lightweight "Sprint Review" artefact — a generated summary of Stories completed since the last review, with their Completion Records — would address this without adding ceremony overhead.
+> ❌ **Gap to flag:** For projects with 👤 stakeholders who want a regular view of progress, there is no batch review mechanism. 👤 The human must check individual Story Completion Records. A lightweight "Sprint Review" artefact — 🤖 a generated summary of Stories completed since the last review, with their Completion Records — would address this without adding ceremony overhead.
 
-### Retrospective
+### Retrospective 🤝
 End-of-sprint reflection: what worked, what didn't, what to improve.
 
 **Status: ❌ Missing**
-The framework has no Retrospective entity or ceremony. Phase Gate Records include a gate check but not a process reflection. Individual Story Completion Records have a Learnings field, but there is no aggregation of learnings into process improvements.
+The framework has no Retrospective entity or ceremony. Phase Gate Records include a gate check but not a process reflection. 🤖 Individual Story Completion Records have a Learnings field, but there is no aggregation of learnings into process improvements.
 
-> ❌ **Gap to flag:** Learnings captured per Story currently have no destination. They are written into the Completion Record but there is no process to review them periodically and produce improvements to conventions, patterns, or delegation rules. A Retrospective artefact — even a lightweight one generated by an agent summarising recent Learnings fields — would close this gap.
+> ❌ **Gap to flag:** 🤖 Learnings captured per Story currently have no destination. They are written into the Completion Record but there is no process to review them periodically and produce improvements to conventions, patterns, or delegation rules. A Retrospective artefact — even 🤖 a lightweight one generated by an agent summarising recent Learnings fields — would close this gap.
 
 ---
 
@@ -336,19 +338,19 @@ The framework covers this through Pattern Contracts and Enabler Stories (propose
 
 These are things SAFe does not address because SAFe was not designed for AI agents. The framework must define them itself. They are listed here to make the boundary explicit.
 
-| Concept | Framework Status | Gap |
-|---|---|---|
-| **Session Log** | ✅ Defined | No gap — unique to AI agents |
-| **Exact State** | ✅ Defined | No gap — unique to AI agents |
-| **Work Interval** | ✅ Defined | No gap — unique to AI agents |
-| **Research Date + event-based staleness** | ✅ Defined (event model) | No gap — unique to AI agents |
-| **Delegation Level** | ✅ Defined | No gap — unique to AI agents |
-| **Cold-start protocol** | ✅ Defined | No gap — unique to AI agents |
-| **Completion Record** | ✅ Defined | No gap — unique to AI agents |
-| **Pattern Contract propagation** | ✅ Defined | No gap — unique to AI agents |
-| **Subagent pipelines** | ✅ Defined in package design | Not yet in framework docs — gap between design doc and framework spec |
-| **Human/agent escalation boundary** | ⚠️ Partially defined | Defined for staleness validation; needs to be stated as a universal principle across all framework processes, not just Research Date handling |
-| **Token budget tracking** | ❌ Missing | Work Intervals track token counts but there is no mechanism to set or enforce a token budget on a Spike or any bounded investigation. The budget exists conceptually but has no entity field. |
+| Concept | Who owns it | Framework Status | Gap |
+|---|---|---|---|
+| **Session Log** | 🤖 writes · 🤖 reads | ✅ Defined | No gap — unique to AI agents |
+| **Exact State** | 🤖 writes · 🤖 reads on resume | ✅ Defined | No gap — unique to AI agents |
+| **Work Interval** | 🤖 records automatically | ✅ Defined | No gap — unique to AI agents |
+| **Research Date + event-based staleness** | 🤖 validates · 👤 sees only conflicts | ✅ Defined (event model) | No gap — unique to AI agents |
+| **Delegation Level** | 👤 sets per Story · 🤖 enforces | ✅ Defined | No gap — unique to AI agents |
+| **Cold-start protocol** | 🤖 runs on every session start | ✅ Defined | No gap — unique to AI agents |
+| **Completion Record** | 🤖 writes · 👤 signs off | ✅ Defined | No gap — unique to AI agents |
+| **Pattern Contract propagation** | 🤖 declares · 🤖 auto-flags downstream | ✅ Defined | No gap — unique to AI agents |
+| **Subagent pipelines** | 🤖 orchestrates · 👤 triggers via command | ✅ Defined in package design | Not yet in framework docs — gap between design doc and framework spec |
+| **Human/agent escalation boundary** | 🤖 handles autonomously · 👤 only for genuine conflicts | ⚠️ Partially defined | Defined for staleness validation; needs to be stated as a universal principle across all framework processes, not just Research Date handling |
+| **Token budget tracking** | 🤖 should enforce · 👤 sets budget | ❌ Missing | Work Intervals track token counts but there is no mechanism to set or enforce a token budget on a Spike or any bounded investigation. The budget exists conceptually but has no entity field. |
 
 ---
 
