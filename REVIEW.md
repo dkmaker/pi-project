@@ -66,9 +66,15 @@ Every Epic gets an explicit scope-in and scope-out. The AI challenges vague scop
 
 For each Epic, the work is broken down into individual Tasks — discrete units of work, each completable in one focused session.
 
+> **SAFe proposal:** The entity currently called a "Task" maps directly to what SAFe calls a **Story** — a user-facing unit of work with Acceptance Criteria, a goal statement, and a Completion Record. In SAFe, a "Task" is the smaller technical step *inside* a Story. Renaming accordingly removes ambiguity: everyone — human or AI — already has a strong shared understanding of what a Story is versus what a Task is. This also opens an optional **Feature** layer between Epic and Story, for grouping related Stories within a planning period when an Epic is large enough to warrant it.
+
 Each Task gets a full brief: what it needs to accomplish, what already exists that it builds on, what approach was researched and decided, what files it will touch, what the observable criteria for being done look like. Critically, every Task includes a **Research Date** — the date the technical approach was validated. If that date is more than 60 days old when the task is actually worked, the agent checks whether the approach is still valid before writing a line of code.
 
+> **SAFe proposal:** Research-only Tasks — where the output is a finding or recommendation rather than delivered code — have a precise SAFe name: a **Spike**. A Spike is time-boxed, has a defined question to answer, and produces a documented finding. Naming these explicitly separates "investigation work" from "delivery work" and sets correct expectations for what done looks like.
+
 Tasks that establish patterns other Tasks must follow create **Pattern Contracts** — a declared interface that downstream work depends on. If that pattern later changes, every dependent task is automatically flagged for review before it is started.
+
+> **SAFe proposal:** Pattern Contracts correspond to what SAFe calls **Architectural Runway** — the technical foundations that future Stories depend on. Tasks that build this runway rather than deliver user-visible value are called **Enabler Stories** in SAFe. Naming them explicitly (Business Story vs Enabler Story) makes the intent of every work item visible immediately, which helps both the human prioritising the backlog and the AI agent understanding what "done" means for each type.
 
 Dependencies between tasks are mapped explicitly. A task cannot begin until everything it depends on is done. The dependency graph is verified before Phase 3 closes.
 
@@ -96,8 +102,12 @@ Without this, every session restart costs 15–30 minutes of reconstruction. Wit
 ### Task
 The primary unit of work. Each task is small enough to complete in one session and carries a complete brief: goal, full context, research, acceptance criteria, affected files, subtasks. An agent reading only a Task should know exactly what to do — no clarification needed.
 
+> **SAFe proposal:** Rename **Task → Story**. In SAFe — and in common usage across Jira, Linear, GitHub, and Azure DevOps — a Story is the work unit that has a goal statement, Acceptance Criteria, and a Completion Record. A "Task" in those same tools means the smaller technical step inside a Story. The current entity is unambiguously a Story by that definition. Using the correct name means the human and the AI agent share an existing, trained understanding of the entity without the framework needing to redefine common words. Additionally, SAFe recognises two Story subtypes worth naming explicitly: a **Business Story** (delivers user-visible value) and an **Enabler Story** (builds technical foundations that future Stories depend on). Making this distinction visible on every Story removes the need to explain why some Stories don't appear to do anything the user would notice.
+
 ### Subtask
 An ordered checklist inside a Task. This exists because it allows resuming a half-done task precisely. "Subtask 3 of 7 done, stopped at subtask 4" is a complete resume point. Without subtasks, partial work is opaque.
+
+> **SAFe proposal:** Rename **Subtask → Task**. In SAFe, a Task is exactly this: a concrete, ordered, binary-done technical step inside a Story. The rename flows directly from Story above — once the primary work unit is called a Story, its internal steps are correctly called Tasks. No behaviour changes; only the names align with what every tool and practitioner already calls them.
 
 ### Decision
 A recorded choice with its rationale and the options that were rejected. Six months later — or in the next session — "we chose this library because of X" is not useful. "We chose this library over Y and Z because of specific constraint A, and we rejected Y because of known issue B" gives an agent the information to know whether to revisit the decision if circumstances change.
@@ -110,6 +120,8 @@ If a question is blocking a specific task, and that task becomes active while th
 ### Blocker
 Something preventing a task from moving forward. Always typed (dependency, resource, decision, specialist needed), always has an explicit resolution path. A blocker without a resolution path is a dead end masquerading as a status update.
 
+> **SAFe proposal:** Rename **Blocker → Impediment**. SAFe, Scrum, and virtually every agile tool use "Impediment" as the standard term for anything actively preventing work from proceeding. The rename also clarifies the Question–Blocker relationship: a Question that is open and blocking a Story generates an **Impediment** on that Story. Resolving the Question resolves the Impediment. This is the exact Impediment model SAFe uses — raised by the team, owned by someone with authority to clear it, tracked until resolved. The concept is unchanged; the name becomes universally recognised.
+
 ### Pattern Contract
 When one task establishes an interface, data structure, or architectural pattern that other tasks will rely on, that becomes a Pattern Contract. Other tasks declare Pattern Dependencies on it.
 
@@ -117,6 +129,8 @@ If the pattern changes — which happens — every dependent task is automatical
 
 ### Verification
 Some tasks require more than "the code looks right." An integration with an external API must actually work. A security-sensitive piece of code must be reviewed. Verification records track what type of verification was required, what the result was, and if it failed — what happened next. Failed verifications enter a defined recovery loop. They are not dead ends.
+
+> **SAFe proposal:** SAFe splits this into two distinct concepts worth naming explicitly. **Acceptance Criteria** are the specific, observable conditions defined per Story that confirm the Story does what it was meant to do — written before work starts, checked when it ends. The **Definition of Done** is a consistent project-wide quality checklist (code reviewed, tests passing, no known regressions) that applies to every Story regardless of its individual criteria. The current Verification entity covers both. Making the split explicit helps the human understand which checks are unique to a specific Story and which are non-negotiable standards across all work.
 
 ### Risk
 Any potential future problem identified during research or planning. Risks live in a Risk Register. A realized risk becomes a Blocker on the relevant task — it is not a surprise. An accepted risk is documented as a decision with rationale.
@@ -158,6 +172,8 @@ These are the things that seem solid and the things that warrant scrutiny:
 
 **The Phase Completion Record gate is the right mechanism.** Making the gate a file the next-phase agent reads — not a human click or a verbal agreement — closes the loop properly. The gate is either passed or it isn't.
 
+> **SAFe proposal:** SAFe calls this an **Inspect and Adapt** event — a formal retrospective and gate at the end of each Program Increment. The output is a structured record of what was achieved, what gaps remain, and what changes are made before the next increment begins. Renaming "Phase Completion Record" to **Phase Gate Record** aligns with this concept and with the general term "phase gate" used across project management disciplines, making it immediately recognisable without needing explanation.
+
 **Pattern Contract propagation is clever and necessary.** Automatically flagging dependent tasks when an interface changes is not over-engineering — it is exactly the kind of invisible bug this class of system should prevent.
 
 **Work Interval tracking being extension-managed, not agent-managed, is correct.** An agent cannot know how long it ran. Having the surrounding system record it automatically is the right architecture.
@@ -170,13 +186,23 @@ These are the things that seem solid and the things that warrant scrutiny:
 
 **The framework is relatively heavyweight for small projects.** A two-day prototype does not need a Risk Register, Change Requests, Pattern Contracts, or Phase Completion Records. The framework currently has no "lightweight mode." This is worth addressing — either with a minimal profile for small projects, or with clear guidance on which entities are optional at what scale.
 
+> **SAFe proposal:** SAFe explicitly addresses this through its four configurations — **Essential SAFe** is the minimal viable version, dropping portfolio governance, multi-team coordination, and large-scale planning ceremonies. For solo developers and small projects, Essential SAFe is the reference point: keep Epics, Stories, Tasks, Acceptance Criteria, Impediments, and Risks — and treat everything else (Features, Phase Gate Records, Pattern Contracts, Change Requests) as optional layers that are added when the project is complex enough to need them. Defining a clear "Essential" profile for this framework — with explicit guidance on which entities are required vs optional at which project scale — would resolve the overhead concern directly.
+
 **Question escalation after three sessions may be too slow.** If a Question is blocking a task that the team needs to start in the next session, waiting three sessions before escalation is too long. There should probably be an "urgent" flag on Questions that escalates immediately if the blocked task is high priority.
+
+> **SAFe proposal:** SAFe handles this through the **Impediment** model directly — any Question that generates an Impediment on an active Story is by definition urgent, because an active Story is in-flight work. The Impediment does not wait for a session count; it surfaces immediately at session start as long as the blocked Story is active or next in priority. The three-session escalation threshold should remain for non-blocking Questions (general open decisions), while any Question that has generated an Impediment on a Story should escalate on the next session regardless of age.
 
 **The Specialist routing process is correct but may create long pauses.** When a task is escalated to a specialist — a security review, a design review — the task sits Blocked until the specialist returns output. There is no mechanism for the system to pursue other work proactively while waiting. The human must notice the blocker, route the work, wait, and return the output. This could be a long gap. Worth considering whether the session log should have a "waiting for external" state that the system surfaces more actively.
 
+> **SAFe proposal:** SAFe handles this through the **Program Board** — a visual map of Stories, their dependencies, and their external blockers, reviewed at every planning session so nothing waits invisibly. At the scale of this framework, the equivalent is surfacing "waiting for external" as a distinct Mode state (alongside the existing `normal`, `change_management`, etc.), so it is the first thing both the human and agent see at session start. The Session Log's Next Actions field should also be required to list any Stories currently blocked on external specialist output, with the date the routing was made, so the wait is never invisible across sessions.
+
 **Verification staleness may be underweighted.** A task researched today against a library's current API is solid. The same task six months later may be working against an outdated API. The 60-day staleness threshold is reasonable but arbitrary. For fast-moving ecosystems (ML libraries, cloud APIs) it may be far too long. Worth considering whether the staleness threshold should be configurable per Tech Stack Entry, not global.
 
+> **SAFe proposal:** SAFe addresses technology currency through **Tech Stack Version Update** process — each Tech Stack entry carries its own review cadence, and the ART (or in this case the framework) flags when a dependency has had a major version release since the Story's Research Date. Making the staleness threshold a property of each Tech Stack Entry (e.g., "react: 90 days, openai-sdk: 14 days") rather than a global 60-day default would correctly reflect the different rates of change across the technology landscape. Fast-moving libraries get short windows; stable infrastructure libraries get longer ones.
+
 **The four human review outcomes are good — but Minor Revision scope control depends entirely on the human.** The framework says "the agent must not re-interpret or expand beyond the stated revision." That is a policy statement, not an enforcement mechanism. If the revision description is vague, the agent may still expand. The revision scope should be written as a formal, bounded task brief before the agent starts the revision — otherwise the same ambiguity problem that the framework solves in Phase 3 reappears at revision time.
+
+> **SAFe proposal:** SAFe's equivalent is treating a revision as a new **Story** — even if it is small. Writing the revision scope as a bounded Story brief (with explicit Acceptance Criteria and affected files) before the agent starts the revision work applies the same discipline Phase 3 requires for new work. This is not overhead for a significant revision; it is the minimum needed to prevent the agent from interpreting "fix the layout" as license to refactor the entire component. The framework already has the Story Brief mechanism — it should require it for Minor Revisions as well as for new work.
 
 ---
 
@@ -189,3 +215,5 @@ The framework's approach of making everything explicit and file-resident is the 
 The biggest open risk is Phase 1 quality, and the biggest open design question is whether the framework can scale down gracefully for smaller projects. Both are solvable. Neither is a reason to not build this.
 
 The right first question for review: **Is the framework solving the right problem for the projects you actually run?** If your projects are typically longer than a few sessions, involve decisions made over multiple conversations, and use AI assistance for implementation — this framework addresses the friction you are already feeling, whether or not you have named it yet.
+
+> **SAFe proposal — summary of all naming changes:** Across this review, a recurring theme is that the framework's private vocabulary creates unnecessary friction. The proposal is to adopt SAFe terminology as the shared contract between human and AI agent — not the full enterprise SAFe ceremony structure, but the naming: **Story** (not Task), **Task** (not Subtask), **Impediment** (not Blocker), **Phase Gate Record** (not Phase Completion Record), **Spike** (for research-only Stories), **Enabler Story** (for technical foundation work), **Feature** (optional grouping layer between Epic and Story), **Acceptance Criteria** and **Definition of Done** (splitting what is currently called Verification). These names are already understood by every developer, every AI agent trained on software development, and every project management tool in common use. Adopting them costs nothing and removes the need for any onboarding into the framework's terminology.
