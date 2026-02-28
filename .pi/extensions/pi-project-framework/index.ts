@@ -2,7 +2,6 @@
  * pi-project-framework extension — entry point
  *
  * Registers hooks, tools, commands for the AI-Optimized Project Management Framework.
- * For now, only the generic questionnaire widget + demo command are wired up.
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
@@ -11,63 +10,7 @@ import { Text, truncateToWidth } from "@mariozechner/pi-tui";
 import { runQuestionnaire, type QuestionDef, type QuestionnaireResult } from "./src/widgets/questionnaire/index";
 
 export default function (pi: ExtensionAPI) {
-	// ─── /prj-ask command — quick way to test the questionnaire widget ──
-
-	pi.registerCommand("prj-ask", {
-		description: "Run an interactive questionnaire (demo / testing)",
-		handler: async (_args, ctx) => {
-			const demoQuestions: QuestionDef[] = [
-				{
-					id: "vision",
-					label: "Vision",
-					prompt: "Tell me what you want to build.",
-					type: "free_text",
-				},
-				{
-					id: "target_env",
-					label: "Target",
-					prompt: "What is the target environment?",
-					type: "single_choice",
-					options: [
-						{ value: "web", label: "Web application (browser)" },
-						{ value: "mobile", label: "Mobile app (iOS/Android)" },
-						{ value: "api", label: "API / Backend service" },
-						{ value: "cli", label: "CLI tool" },
-						{ value: "desktop", label: "Desktop application" },
-					],
-				},
-				{
-					id: "tech_categories",
-					label: "Stack",
-					prompt: "Which technology categories does this project need?",
-					type: "multi_select",
-					options: [
-						{ value: "frontend", label: "Frontend", description: "React, Vue, Svelte, etc." },
-						{ value: "backend", label: "Backend", description: "Node, Python, Go, etc." },
-						{ value: "database", label: "Database", description: "PostgreSQL, MongoDB, etc." },
-						{ value: "auth", label: "Auth", description: "OAuth, JWT, SSO" },
-						{ value: "storage", label: "Storage", description: "S3, local filesystem" },
-						{ value: "ci_cd", label: "Deployment/CI", description: "Docker, GitHub Actions, etc." },
-						{ value: "ai_ml", label: "AI/ML", description: "LLMs, embeddings, training" },
-					],
-				},
-			];
-
-			const result = await runQuestionnaire(ctx, demoQuestions);
-
-			if (result.cancelled) {
-				ctx.ui.notify("Questionnaire cancelled.", "warning");
-				return;
-			}
-
-			const summary = result.answers
-				.map((a) => `${a.id}: ${a.display}`)
-				.join("\n");
-			ctx.ui.notify(`Collected ${result.answers.length} answers:\n${summary}`, "info");
-		},
-	});
-
-	// ─── questionnaire tool — LLM-callable version ──────────────────
+	// ─── questionnaire tool — LLM-callable ──────────────────────────
 
 	const QuestionOptionSchema = Type.Object({
 		value: Type.String({ description: "Value returned when selected" }),
