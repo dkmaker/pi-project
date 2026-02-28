@@ -1,0 +1,1 @@
+{"id":"rule-1","project_id":"proj-1","statement":"No any types","rationale":"Type safety","scope":"global","enforcement":"linter"}

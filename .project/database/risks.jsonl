@@ -1,0 +1,1 @@
+{"id":"risk-1","project_id":"proj-1","description":"JSONL may not scale past 10k records","likelihood":"low","impact":"Need to switch to SQLite","affected_entity_ids":"epic-1,task-2","mitigation":"Benchmark at 10k records","mitigation_task_id":"task-4","status":"open","owner":"agent","identified_at_phase":"phase_2","last_reviewed":"2026-01-15","realization_notes":""}

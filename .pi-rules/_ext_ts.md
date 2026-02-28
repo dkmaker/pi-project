@@ -1,0 +1,2 @@
+- Every .ts file needs @module + @description JSDoc header, method-level JSDoc, field-level JSDoc, cross-references to related files. Use `import type` for type-only imports. No parameter properties.
+- Never use .js extensions in imports — use `from './foo'` not `from './foo.js'`.

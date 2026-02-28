@@ -8,6 +8,9 @@ This file orients AI agents to the structure of this repository. Read it before 
 
 ```
 .
+├── archive/
+│   └── deliverables/   # Completed build trackers and delivery records
+│       └── TRACKER-database-module.md  # ✅ Database module build tracker (all 11 steps done)
 └── FRAMEWORK/          # AI-Optimized Project Management Framework (documentation only)
     ├── AGENTS.md       # This file — agent orientation and critical conventions
     ├── INDEX.md        # Framework entry point: design principles + entity hierarchy overview
@@ -50,6 +53,70 @@ The framework's core purpose: any agent should be able to resume any project col
    - Phase 2 (Planning): `planning.md`, `change-management.md`, `risk.md`
    - Phase 3 (Decomposition): `task.md`, `relationships.md`, `verification.md`, `risk.md`
    - Phase 4 (Implementation): `tracking.md`, `session-log.md`, `reference.md`, `verification.md`
+
+---
+
+## Implementation Structure
+
+All implementation code lives under `.pi/extensions/pi-project-framework/`:
+
+```
+.pi/extensions/pi-project-framework/
+├── package.json          # Own deps: vectra, @huggingface/transformers
+├── index.ts              # Extension entry — DO NOT MODIFY
+└── src/
+    ├── widgets/          # Existing UI widgets — DO NOT MODIFY
+    └── db/               # Database module (current build focus)
+        ├── schema/       # TypeBox schemas, enums, relationships, transitions
+        ├── storage/      # StorageAdapter interface + JSONL/Memory implementations
+        ├── embedding/    # EmbeddingAdapter interface + Transformers/NoOp implementations
+        ├── repository/   # BaseRepository + 35 concrete repositories
+        ├── query/        # Fluent query builder
+        ├── search/       # Vectra-backed semantic search
+        ├── database.ts   # Database facade (public API)
+        ├── types.ts      # Shared error classes
+        └── index.ts      # Public re-exports
+```
+
+**Build tracker:** [TRACKER.md](TRACKER.md) is the single source of truth for build progress, step definitions, and acceptance criteria. Read it before writing any code.
+
+---
+
+## Runtime Environment
+
+- **No `tsconfig.json`** — pi runs TypeScript directly via jiti loader.
+- **No build step** — raw `.ts` files, imported directly.
+- **Node.js strip-only TS mode** — TypeScript parameter properties (`constructor(private x: string)`) are NOT supported. Declare fields explicitly and assign in constructor body.
+- **`import type`** — use `import type { X }` for interfaces/types that have no runtime value. Regular `import { X }` on a type-only module causes `ERR_MODULE_NOT_FOUND` at runtime.
+- **No `.js` extensions in imports** — use `import { X } from './foo'` not `'./foo.js'`.
+
+### Dependencies
+
+- **Pi-provided (import directly, no install):** `@mariozechner/pi-coding-agent`, `@mariozechner/pi-tui`, `@sinclair/typebox`
+- **Own deps** go in `package.json` at `.pi/extensions/pi-project-framework/package.json`
+- **Schema library:** TypeBox only (NOT Zod). Use `Type.Object()`, `Static<>`, `Value.Check()`.
+
+### Data locations
+
+- **Runtime data:** `.project/database/` (JSONL files, committed to git — project state for cold-start)
+- **Vector indexes:** `.project/database/vectors/` (gitignored, regenerated on startup)
+
+---
+
+## Code Quality
+
+- **All TypeScript files must have JSDoc documentation optimized for AI readability.** This includes:
+  - **Module-level `@module` + `@description`** at the top of every file: what this file contains, why it exists, and source references to FRAMEWORK docs where applicable.
+  - **Entity/class/interface-level JSDoc**: what it represents, when it's created, lifecycle notes, and key behavioral rules (e.g., "abandoned status without AbandonmentRecord is invalid").
+  - **Relationship context**: FK targets, cardinality, nullable semantics — so an agent reading the schema knows the full graph without cross-referencing.
+  - **Field-level JSDoc** on every non-obvious field: what it means, expected format (e.g., "ISO datetime", "comma-separated IDs"), cross-references to related entities.
+  - **Method-level JSDoc** on every public method: what it does, what it returns, edge cases (e.g., "returns [] if collection doesn't exist").
+  - **Behavioral notes** where logic is non-obvious: invariants, constraints, what happens when values change.
+  - **Cross-references** to consuming/implementing files so an agent can trace dependencies without grep.
+
+- **Documentation is for cold-start agents.** An agent with no chat history should be able to read any file and understand what it does, what it connects to, and what rules govern it — without reading any other file first.
+
+- **Project data lives under `.project/`.** All runtime data, configuration, and project state files are stored under the `.project/` directory at the project root. This is committed to git (it IS the project state for cold-start resumption). Exception: `.project/database/vectors/` is gitignored — vectors are derived data, regenerated on startup if missing.
 
 ---
 

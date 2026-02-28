@@ -1,5 +1,26 @@
 /**
- * Questionnaire rendering — builds the TUI output lines.
+ * @module widgets/questionnaire/renderer
+ * @description Questionnaire TUI rendering — builds styled output lines.
+ *
+ * Pure rendering: reads QuestionnaireState and produces string[] lines.
+ * No state mutation occurs here. All styling uses the pi theme object.
+ *
+ * Render sections:
+ * - Top border + title (single question or "N of M" for multi)
+ * - Tab bar (multi-question only): shows answered/unanswered status per tab
+ * - Content area: dispatches to type-specific renderers:
+ *   - renderSubmitTab: review & submit page with answer summary
+ *   - renderFreeText: editor or "press Enter to type" prompt
+ *   - renderChoiceQuestion: numbered option list with cursor/checkmarks
+ *   - renderCustomInput: "Type something…" editor overlay
+ *   - renderCommentField: optional comment for multi_select
+ * - Help line: context-sensitive keyboard shortcut hints
+ * - Bottom border
+ *
+ * Dependencies:
+ * - RenderDeps.state: QuestionnaireState (read-only during render)
+ * - RenderDeps.theme: pi theme object for styling (fg, bg, bold, etc.)
+ * - RenderDeps.editor: Editor instance for rendering active text input
  */
 
 import { truncateToWidth } from "@mariozechner/pi-tui";

@@ -1,0 +1,14 @@
+{
+  "name": "pi-project-framework",
+  "private": true,
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "vectra": "^0.12.3",
+    "yaml": "^2.8.2"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*",
+    "@sinclair/typebox": "*"
+  }
+}

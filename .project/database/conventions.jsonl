@@ -1,0 +1,1 @@
+{"id":"conv-1","project_id":"proj-1","name":"File naming","description":"kebab-case for files","rationale":"Consistency","applies_to":"all TypeScript files"}

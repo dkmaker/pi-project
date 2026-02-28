@@ -1,0 +1,1 @@
+{"id":"dec-1","project_id":"proj-1","title":"Use TypeBox for schemas","date":"2026-01-05","context":"Need schema validation library","decision":"Use TypeBox","rationale":"Bundled with pi, no extra deps","consequences":"Must use TypeBox API","affected_task_ids":"task-1,task-2","status":"active"}

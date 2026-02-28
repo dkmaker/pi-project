@@ -1,0 +1,5 @@
+{"id":"sub-1","task_id":"task-2","order_index":0,"description":"Create base repository class","done":true,"notes":""}
+{"id":"sub-2","task_id":"task-2","order_index":1,"description":"Create entity repositories","done":false,"notes":""}
+{"id":"sub-3","task_id":"task-2","order_index":2,"description":"Add event emission","done":false,"notes":""}
+{"id":"sub-4","task_id":"task-1","order_index":0,"description":"Define enums","done":true,"notes":""}
+{"id":"sub-5","task_id":"task-1","order_index":1,"description":"Define entity schemas","done":true,"notes":""}

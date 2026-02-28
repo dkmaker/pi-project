@@ -1,5 +1,19 @@
 /**
- * Questionnaire widget state — all mutable state lives here.
+ * @module widgets/questionnaire/state
+ * @description Questionnaire widget state — all mutable state lives here.
+ *
+ * QuestionnaireState is the single source of truth for the widget's runtime state.
+ * It tracks:
+ * - Navigation: current tab, option cursor index
+ * - Multi-select: checked options per question, comment drafts
+ * - Editor focus: which input mode is active (freeText, customInput, comment)
+ * - Collected answers: completed answers per question id
+ *
+ * State is mutated by input.ts (keyboard handling) and read by renderer.ts (display).
+ * The run.ts wires them together and owns the state instance.
+ *
+ * Key invariant: only one editor mode can be active at a time
+ * (freeTextMode, customInputMode, commentFocused are mutually exclusive).
  */
 
 import type { NormalizedQuestion, QuestionAnswer, QuestionOption } from "./types";

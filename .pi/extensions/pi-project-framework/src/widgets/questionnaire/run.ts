@@ -1,5 +1,20 @@
 /**
- * Questionnaire runner — wires state, input, and renderer together via ctx.ui.custom().
+ * @module widgets/questionnaire/run
+ * @description Questionnaire runner — orchestrates state, input, and renderer.
+ *
+ * This is the integration layer. It:
+ * 1. Normalizes question definitions (applies defaults)
+ * 2. Creates a QuestionnaireState instance
+ * 3. Creates a shared pi-tui Editor for text input
+ * 4. Wires editor.onSubmit to state transitions (custom input, comments, free text)
+ * 5. Registers a ctx.ui.custom() widget that delegates:
+ *    - render() → renderer.renderQuestionnaire()
+ *    - handleInput() → input.handleInput()
+ * 6. Returns a Promise<QuestionnaireResult> that resolves when done() is called
+ *
+ * The widget uses render caching (cachedLines) — invalidated on refresh().
+ *
+ * Requires ctx.hasUI === true. Returns { cancelled: true } if no UI or no questions.
  */
 
 import { Editor, type EditorTheme } from "@mariozechner/pi-tui";

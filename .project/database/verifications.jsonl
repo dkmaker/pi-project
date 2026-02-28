@@ -1,0 +1,2 @@
+{"id":"ver-1","task_id":"task-1","type":"testing","source":"unit tests","current_result":"passed","stale":false}
+{"id":"ver-2","task_id":"task-2","type":"code_review","source":"self review","current_result":"pending","stale":false}

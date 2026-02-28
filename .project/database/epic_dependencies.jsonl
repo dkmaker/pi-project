@@ -1,0 +1,2 @@
+{"id":"edep-1","requires_epic_id":"epic-1","enables_epic_id":"epic-2","nature":"hard","gate_condition":"Data layer must be complete"}
+{"id":"edep-2","requires_epic_id":"epic-2","enables_epic_id":"epic-3","nature":"soft","gate_condition":"API should be available"}

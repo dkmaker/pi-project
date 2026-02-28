@@ -1,5 +1,14 @@
 /**
- * Public types for the questionnaire widget.
+ * @module widgets/questionnaire/types
+ * @description Public types and normalization for the questionnaire widget.
+ *
+ * Type hierarchy:
+ * - QuestionDef: input from the LLM tool call (what the AI provides)
+ * - NormalizedQuestion: internal form with guaranteed label, options, allowOther
+ * - QuestionAnswer: output per question (what the user answered)
+ * - QuestionnaireResult: final output (all answers + cancelled flag)
+ *
+ * normalize() converts QuestionDef[] → NormalizedQuestion[] with defaults applied.
  */
 
 export type QuestionType = "single_choice" | "multi_select" | "free_text";

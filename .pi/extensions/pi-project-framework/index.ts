@@ -1,15 +1,39 @@
 /**
- * pi-project-framework extension — entry point
+ * @module pi-project-framework
+ * @description Extension entry point for the AI-Optimized Project Management Framework.
  *
- * Registers hooks, tools, commands for the AI-Optimized Project Management Framework.
+ * Registers:
+ * - `prj_questionnaire` tool: LLM-callable interactive questionnaire widget.
+ *   Supports single_choice, multi_select, and free_text question types.
+ *   Single question → simple list UI. Multiple questions → tabbed interface with submit page.
+ *
+ * Architecture:
+ * - This file is the ONLY file that interacts with the pi ExtensionAPI.
+ * - The questionnaire widget lives in src/widgets/questionnaire/ (self-contained).
+ * - The database module (src/db/) is an internal dependency — no tools registered here yet.
+ *
+ * DO NOT add database-related tool registrations here during the db module build.
+ * Future work will add tools that consume the Database class from src/db/.
+ *
+ * Dependencies (pi-provided, no install needed):
+ * - @mariozechner/pi-coding-agent: ExtensionAPI type
+ * - @mariozechner/pi-tui: Text, truncateToWidth for tool rendering
+ * - @sinclair/typebox: Type, for tool parameter schemas
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { Text, truncateToWidth } from "@mariozechner/pi-tui";
 import { runQuestionnaire, type QuestionDef, type QuestionnaireResult } from "./src/widgets/questionnaire/index";
+import { registerDbTools } from "./src/db/tools";
+import { initConfig } from "./src/config/config";
+import * as path from "node:path";
 
 export default function (pi: ExtensionAPI) {
+	// ─── config initialization ──────────────────────────────────────
+	const projectRoot = path.resolve(__dirname, '..', '..', '..');
+	const config = initConfig(projectRoot);
+
 	// ─── questionnaire tool — LLM-callable ──────────────────────────
 
 	const QuestionOptionSchema = Type.Object({
@@ -114,4 +138,7 @@ export default function (pi: ExtensionAPI) {
 			return new Text(lines.join("\n"), 0, 0);
 		},
 	});
+
+	// ─── temporary database debug tools ──────────────────────────
+	registerDbTools(pi, projectRoot);
 }

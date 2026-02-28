@@ -1,0 +1,1 @@
+{"id":"cr-1","project_id":"proj-1","initiator":"human","target_entity_type":"epic","target_entity_id":"epic-3","previous_state":"Marketplace full integration","proposed_state":"Marketplace read-only","rationale":"Reduce scope for MVP","impact_analysis":"Removes write endpoints","required_phase_reruns":"none","status":"pending_review","human_sign_off":"","rejection_rationale":""}

@@ -1,1 +1,3 @@
 .search_cache
+node_modules/
+.project/database/vectors/

@@ -1,0 +1,1 @@
+{"id":"q-1","project_id":"proj-1","description":"Should we add caching to the data layer?","impact_entity_ids":"epic-1","options":"Yes, in-memory cache|No, premature optimization","owner":"human","status":"open","resolution":"","session_count":2,"escalation_flag":false,"defer_until_condition":""}

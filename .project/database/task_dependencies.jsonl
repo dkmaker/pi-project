@@ -1,0 +1,4 @@
+{"id":"tdep-1","task_id":"task-3","requires_task_id":"task-2","nature":"hard"}
+{"id":"tdep-2","task_id":"task-4","requires_task_id":"task-3","nature":"hard"}
+{"id":"tdep-3","task_id":"task-6","requires_task_id":"task-5","nature":"hard"}
+{"id":"tdep-4","task_id":"task-8","requires_task_id":"task-7","nature":"hard"}

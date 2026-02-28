@@ -1,0 +1,2 @@
+{"id":"tse-1","project_id":"proj-1","name":"TypeScript","category":"language","version":"5.4","purpose":"Primary language","documentation_url":"https://typescriptlang.org","project_specific_notes":"Strict mode","verification_status":"verified"}
+{"id":"tse-2","project_id":"proj-1","name":"Node.js","category":"runtime","version":"22","purpose":"Runtime","documentation_url":"https://nodejs.org","project_specific_notes":"","verification_status":"verified"}

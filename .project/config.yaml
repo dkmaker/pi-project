@@ -1,0 +1,22 @@
+# Project Framework Configuration
+# Auto-generated — edit values as needed, new keys are added automatically.
+#
+# Docs: see FRAMEWORK/INDEX.md and src/config/defaults.ts for all options.
+project:
+  name: Unnamed Project
+  auto_session_log: true
+database:
+  data_dir: .project/database
+  vector_dir: .project/database/vectors
+  flush_on_write: true
+embedding:
+  enabled: true
+  model: sentence-transformers/all-MiniLM-L6-v2
+  dimensions: 384
+  sync_on_startup: true
+session:
+  max_recent_sessions: 0
+  auto_git_info: true
+delegation:
+  default_level: implement
+  require_human_review: true

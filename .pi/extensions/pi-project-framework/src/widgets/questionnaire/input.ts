@@ -1,5 +1,21 @@
 /**
- * Questionnaire input handling — routes keyboard events to state changes.
+ * @module widgets/questionnaire/input
+ * @description Keyboard input handling for the questionnaire widget.
+ *
+ * Routes raw keyboard data to state mutations. Input handling is split by context:
+ * 1. Editor active (freeText/customInput/comment): delegate to editor, Esc exits
+ * 2. Tab navigation (multi-question): Tab/←→ switch tabs
+ * 3. Submit tab: Enter submits if all answered, Esc cancels
+ * 4. Choice questions: ↑↓ navigate, Space toggles (multi_select), Enter confirms
+ * 5. Free text: Enter opens editor
+ *
+ * Dependencies:
+ * - InputDeps.state: QuestionnaireState (mutated in place)
+ * - InputDeps.editor: shared Editor instance for text input
+ * - InputDeps.refresh: triggers re-render after state change
+ * - InputDeps.done: resolves the questionnaire promise with final result
+ *
+ * Uses pi-tui Key constants and matchesKey() for cross-platform key matching.
  */
 
 import { Key, matchesKey } from "@mariozechner/pi-tui";
