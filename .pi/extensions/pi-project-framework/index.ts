@@ -25,7 +25,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { Text, truncateToWidth } from "@mariozechner/pi-tui";
 import { runQuestionnaire, type QuestionDef, type QuestionnaireResult } from "./src/widgets/questionnaire/index";
-import { registerDbTools } from "./src/db/tools";
+import { registerDebugTools } from "./src/db/_DEBUG_TOOLS";
 import { initConfig } from "./src/config/config";
 import * as path from "node:path";
 
@@ -139,6 +139,6 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	// ─── temporary database debug tools ──────────────────────────
-	registerDbTools(pi, projectRoot);
+	// ─── ⚠️ DEBUG TOOLS — remove before production (see _DEBUG_TOOLS.ts) ───
+	registerDebugTools(pi, projectRoot);
 }

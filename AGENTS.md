@@ -63,10 +63,11 @@ All implementation code lives under `.pi/extensions/pi-project-framework/`:
 ```
 .pi/extensions/pi-project-framework/
 ├── package.json          # Own deps: vectra, @huggingface/transformers
-├── index.ts              # Extension entry — DO NOT MODIFY
+├── index.ts              # Extension entry point
 └── src/
-    ├── widgets/          # Existing UI widgets — DO NOT MODIFY
-    └── db/               # Database module (current build focus)
+    ├── config/           # Shared config system (config.yaml management)
+    ├── widgets/          # UI widgets (questionnaire)
+    └── db/               # Database module
         ├── schema/       # TypeBox schemas, enums, relationships, transitions
         ├── storage/      # StorageAdapter interface + JSONL/Memory implementations
         ├── embedding/    # EmbeddingAdapter interface + Transformers/NoOp implementations
@@ -75,10 +76,31 @@ All implementation code lives under `.pi/extensions/pi-project-framework/`:
         ├── search/       # Vectra-backed semantic search
         ├── database.ts   # Database facade (public API)
         ├── types.ts      # Shared error classes
-        └── index.ts      # Public re-exports
+        ├── index.ts      # Public re-exports
+        ├── _DEBUG_TOOLS.ts           # ⚠️ DEBUG — remove before production
+        └── __tests__/               # Test suite (251 tests)
+            └── __fixtures__/        # Test data factories + sample project
 ```
 
-**Build tracker:** [TRACKER.md](TRACKER.md) is the single source of truth for build progress, step definitions, and acceptance criteria. Read it before writing any code.
+**Build tracker:** [archive/deliverables/TRACKER-database-module.md](archive/deliverables/TRACKER-database-module.md) — completed database module build tracker (all steps done).
+
+---
+
+## Debug / Development Tools
+
+⚠️ **The following files are temporary debug tools and MUST be removed before production:**
+
+| File | What it contains | Removal steps |
+|------|-----------------|---------------|
+| `src/db/_DEBUG_TOOLS.ts` | `db_seed` and `db_query` pi tools for seeding and inspecting the database | Delete this file |
+| `index.ts` lines | `import { registerDebugTools }` and `registerDebugTools(pi, projectRoot)` call | Remove the import and the call |
+| `src/db/__tests__/` | 251 tests + fixture factories + sample project data | Delete entire directory (test fixtures are also consumed by `_DEBUG_TOOLS.ts`) |
+
+**How to remove all debug tooling in one pass:**
+1. Delete `src/db/_DEBUG_TOOLS.ts`
+2. Delete `src/db/__tests__/` directory
+3. In `index.ts`: remove the `import { registerDebugTools }` line and the `registerDebugTools(pi, projectRoot)` call
+4. Commit — the extension will run with only production tools (`prj_questionnaire` + future framework tools)
 
 ---
 

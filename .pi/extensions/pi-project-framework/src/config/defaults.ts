@@ -15,7 +15,7 @@
  *   - delegation: autonomous operation limits
  *
  * Consumed by: ProjectConfig (config.ts)
- * Referenced by: Database (db/database.ts), tools (db/tools.ts), index.ts
+ * Referenced by: Database (db/database.ts), _DEBUG_TOOLS (db/_DEBUG_TOOLS.ts), index.ts
  */
 
 /** Full configuration shape with all sections. */

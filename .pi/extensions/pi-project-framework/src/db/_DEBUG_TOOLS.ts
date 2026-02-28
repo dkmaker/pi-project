@@ -1,16 +1,20 @@
 /**
- * @module db/tools
- * @description Temporary debug tools for seeding and inspecting the database.
+ * @module db/_DEBUG_TOOLS
+ * @description ⚠️  DEBUG/DEVELOPMENT ONLY — REMOVE THIS FILE BEFORE PRODUCTION ⚠️
+ *
+ * Temporary debug tools for seeding and inspecting the database during development.
  *
  * Registers two tools:
  *   - db_seed: Populates the database with a complete synthetic test project
  *   - db_query: Inspects database contents — list collections, count, get by ID, find by field
  *
- * These are development/debug tools. Remove before production.
+ * To remove all debug tooling:
+ *   1. Delete this file (_DEBUG_TOOLS.ts)
+ *   2. In index.ts (extension entry): remove the import and call to registerDebugTools()
  *
  * Related:
  *   - Database (database.ts): the facade these tools operate on
- *   - sample-project.ts: the synthetic data source for seeding
+ *   - __tests__/__fixtures__/sample-project.ts: the synthetic data source for seeding
  */
 
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
@@ -60,7 +64,7 @@ async function getDb(projectRoot: string, onEmbeddingProgress?: EmbeddingProgres
  * @param pi - The pi extension API
  * @param projectRoot - Absolute path to the project root (for .project/database/)
  */
-export function registerDbTools(pi: ExtensionAPI, projectRoot: string): void {
+export function registerDebugTools(pi: ExtensionAPI, projectRoot: string): void {
 
   // ─── db_seed: populate with sample project ─────────────────────
 

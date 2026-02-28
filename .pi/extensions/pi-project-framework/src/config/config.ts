@@ -15,7 +15,7 @@
  * Related:
  *   - defaults.ts: default values and ProjectFrameworkConfig type
  *   - index.ts (extension entry): calls initConfig() on load
- *   - db/tools.ts: reads config for database paths
+ *   - db/_DEBUG_TOOLS.ts: reads config for database paths (debug only — remove before production)
  *   - db/database.ts: uses config for dataDir, vectorDir, embedding settings
  */
 
