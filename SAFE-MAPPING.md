@@ -136,7 +136,11 @@ Enabler Stories follow the same structure as Business Stories but their Goal sta
 
 SAFe's Spike is a time-boxed investigation Story — not designed to produce deliverable code, but to produce a decision or finding. The current framework covers research under the Delegation Level "Research" — but that applies at the Story level, meaning a whole Story is designated as research-only.
 
-A **Spike** is more specific: it is a discrete, time-boxed investigation with a defined question to answer and a defined output format (a finding, a recommendation, a prototype). When Phase 3 research reveals that a particular technical approach is uncertain, the right answer is a Spike Story, not a Research-delegated Story. The Spike has a time budget (e.g., 4 hours), a question ("Is library X viable for this use case?"), and a documented finding. If the finding is "yes," the Spike is done and the implementation Story proceeds. If "no," the Spike surfaces an alternative and the implementation Story is replanned.
+A **Spike** is more specific: it is a discrete, time-boxed investigation with a defined question to answer and a defined output format (a finding, a recommendation, a prototype). When Phase 3 research reveals that a particular technical approach is uncertain, the right answer is a Spike Story, not a Research-delegated Story. The Spike has a token/time budget, a question ("Is library X viable for this use case?"), and a documented finding. If the finding is "yes," the Spike is done and the implementation Story proceeds. If "no," the Spike surfaces an alternative and the implementation Story is replanned.
+
+**Important distinction:** A Spike is planned work to resolve genuine technical uncertainty before a Story can be written. It is not the same as a staleness validation check. Do not create a Spike when a Tech Stack version change triggers a context review — that is handled by an autonomous validation agent (see Research Date below), not by a planned Story. A Spike is only created when a question cannot be answered from existing knowledge and requires active investigation.
+
+Since all work is executed by AI agents, a Spike runs as a **subagent with a bounded token budget** — not an open-ended exploration. The output is a structured finding written to the Story file. The human is only involved if the finding requires a decision that changes scope or approach (which would generate a Question and, if scope-altering, a Change Request).
 
 ---
 
@@ -185,9 +189,51 @@ These entities are either already SAFe-aligned or have no standard equivalent an
 | Pattern Dependency | No SAFe equivalent; keep |
 | Delegation Level | Agent-autonomy model; SAFe has no equivalent |
 | Exact State | AI-agent-specific; no SAFe equivalent |
-| Research Date | AI-agent-specific; no SAFe equivalent |
+| Research Date | AI-agent-specific; no SAFe equivalent; keep — but trigger model is event-based not time-based (see below) |
 | Completion Record | SAFe has "Definition of Done" checks but not a per-Story Completion Record; keep |
 | Goal | "Strategic Theme" is the SAFe equivalent but "Goal" is universally understood; keep |
+
+---
+
+## Research Date: Event-Based Staleness, Not a Calendar Threshold
+
+The original framework used a 60-day calendar threshold on the Research Date field: if a Story's research was more than 60 days old, the agent re-validated it before starting. **This model is wrong for AI-agent-driven projects and should be replaced entirely.**
+
+### Why the calendar model fails
+
+All work in this framework is intended to be executed by AI agents. Projects move from Phase 3 to Phase 4 in days, not months. Sessions are short. A 60-day window will either never fire (the project is done before it triggers) or fire unnecessarily (the library hasn't actually changed, the threshold just elapsed). Calendar time is noise.
+
+### The correct model: event-driven validation
+
+A Story's research is considered potentially stale only when **a Tech Stack Entry it references records a version change after the Story's Research Date**. This is the only meaningful staleness signal.
+
+When a Tech Stack Entry version is updated, a **validation agent** runs automatically in the background. It is not a Spike (which is planned investigative work). It is a bounded autonomous check with three possible outcomes:
+
+| Outcome | What happened | Who handles it |
+|---------|--------------|---------------|
+| **No impact** | The change does not affect this Story's approach | Validation agent closes the flag silently — human never sees it |
+| **Context update** | The approach is still valid but a detail changed (e.g., a method was renamed, a parameter added) | Validation agent updates the Story's Context field directly and closes the flag — human never sees it |
+| **Breaking conflict** | The approach no longer works — breaking change, deprecation, incompatibility | Validation agent raises an **Impediment** on the Story with a specific description of what changed and why the approach fails — surfaces to human |
+
+**The human only ever sees outcome 3.** Everything that can be resolved autonomously is resolved autonomously. Only genuine conflicts requiring a decision escalate.
+
+### What this means for the Research Date field
+
+The Research Date field is retained but its semantics change:
+
+- It is no longer compared against today's date with a fixed threshold
+- It is compared against the version history of each Tech Stack Entry the Story references
+- The comparison is run by the validation agent when a Tech Stack Entry version is updated
+- The Research Date therefore answers: "was this Story researched before or after the last version change in its dependencies?"
+
+### Human / Agent escalation boundary
+
+This model defines the escalation boundary explicitly:
+
+- **Agent resolves autonomously:** no impact checks, context-only updates, routine validation passes
+- **Agent escalates to human:** breaking conflicts only — with a specific Impediment that names the Tech Stack Entry, the version that changed, the Story affected, and exactly why the Story's stated approach no longer holds
+
+This is the principle that applies across the entire framework: **only what genuinely requires human judgment reaches the human.** Everything else is handled by supporting agents and closed without interruption.
 
 ---
 
@@ -203,6 +249,7 @@ These entities are either already SAFe-aligned or have no standard equivalent an
 | **Add** | *(missing)* | **Story Type: Business / Enabler / Spike** | Medium — makes intent explicit on every Story |
 | **Clarify** | Verification | Split into Acceptance Criteria + DoD check | Low — clarifies which is per-Story vs project-wide |
 | **Clarify** | Question → Blocker | Question → Impediment (when blocking) | Low — naming only, logic unchanged |
+| **Redesign** | Research Date (60-day threshold) | **Event-based staleness** — triggered by Tech Stack version change, not calendar time; validated autonomously by agent; only breaking conflicts reach human | High — changes the trigger model and removes the calendar threshold entirely |
 
 ---
 
